@@ -38,7 +38,6 @@ body { overflow-x: hidden; }
 .drawer-overlay,.modal-backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
 .loader { border-top-color: #01875f; animation: spinner 0.6s linear infinite; }
 @keyframes spinner { to { transform: rotate(360deg); } }
-.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 </style>
 </head>
 <body class="bg-white">
@@ -89,7 +88,6 @@ body { overflow-x: hidden; }
           </button>
           <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-white text-purple-600 rounded-xl font-semibold">إغلاق</button>
         </div>
-      </div>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
         <div class="bg-white/10 backdrop-blur rounded-xl p-4">
           <p class="text-sm text-purple-100 mb-1">إجمالي التحميلات</p>
@@ -181,7 +179,7 @@ body { overflow-x: hidden; }
           <option value="kids">الأطفال</option>
         </select>
       </div>
-      <div id="appsListAdmin" class="space-y-3 max-h- overflow-y-auto"></div>
+      <div id="appsListAdmin" class="space-y-3 max-h-[600px] overflow-y-auto"></div>
     </div>
   </div>
 </div>
@@ -279,7 +277,7 @@ body { overflow-x: hidden; }
 </div>
 
 <div id="appModal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-3 md:p-6">
-  <div class="bg-white rounded-3xl max-w-4xl w-full max-h- overflow-y-auto shadow-2xl" id="modalContent"></div>
+  <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl" id="modalContent"></div>
 </div>
 
 <div id="genericModal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-4">
@@ -292,270 +290,55 @@ body { overflow-x: hidden; }
     <p id="toastMessage" class="font-semibold"></p>
   </div>
 </div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, orderBy, increment, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-<script>
-let apps = JSON.parse(localStorage.getItem('mohamedStoreApps') || '[]');
-let currentCategory = 'home';
-let isAdmin = localStorage.getItem('isAdmin') === 'true';
+const firebaseConfig = {
+  apiKey: "AIzaSyDSxk0kXJGs__nmtF4V4V_Ro_kkBhzE6IA",
+  authDomain: "mohamed-play-store.firebaseapp.com",
+  projectId: "mohamed-play-store",
+  storageBucket: "mohamed-play-store.firebasestorage.app",
+  messagingSenderId: "966596585443",
+  appId: "1:966596585443:web:ac43976b53e72225ee62d6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const ADMIN_PASSWORD = 'mohamed123';
+let currentSection = 'home';
+let filteredApps = [];
+let logoClickCount = 0;
+let logoClickTimer = null;
+let isAdminLoggedIn = false;
+let allAppsData = {};
+let isEditMode = false;
 
-if (apps.length === 0) {
-  apps = [
-    {
-      id: 1,
-      name: 'تطبيق تجريبي',
-      developer: 'MOHAMED GHARIB',
-      category: 'apps',
-      size: '15.2 MB',
-      icon: 'https://via.placeholder.com/512x512/01875f/ffffff?text=APP',
-      downloadUrl: '#',
-      description: 'هذا تطبيق تجريبي للمتجر. يمكنك تعديله أو حذفه من لوحة التحكم.',
-      screenshots: ['https://via.placeholder.com/800x600/01875f/ffffff?text=Screenshot+1'],
-      features: ['واجهة سهلة الاستخدام', 'سريع وخفيف', 'يدعم اللغة العربية'],
-      downloads: 1250,
-      views: 3400,
-      rating: 4.5,
-      dateAdded: new Date().toISOString()
-    }
-  ];
-  saveApps();
-}
-
-function saveApps() {
-  localStorage.setItem('mohamedStoreApps', JSON.stringify(apps));
-}
-
-function updateStats() {
-  const totalDownloads = apps.reduce((sum, app) => sum + (app.downloads || 0), 0);
-  const totalViews = apps.reduce((sum, app) => sum + (app.views || 0), 0);
-  document.getElementById('totalDownloads').textContent = totalDownloads.toLocaleString('ar-EG');
-  document.getElementById('totalViews').textContent = totalViews.toLocaleString('ar-EG');
-  document.getElementById('totalApps').textContent = apps.length;
-}
-
-function renderApps(filterCategory = currentCategory) {
-  const grid = document.getElementById('appsGrid');
-  const noResults = document.getElementById('noResults');
-  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-
-  let filteredApps = apps;
-
-  if (filterCategory!== 'home' && filterCategory!== 'all') {
-    filteredApps = filteredApps.filter(app => app.category === filterCategory);
-  }
-
-  if (searchTerm) {
-    filteredApps = filteredApps.filter(app =>
-      app.name.toLowerCase().includes(searchTerm) ||
-      app.developer.toLowerCase().includes(searchTerm) ||
-      app.description.toLowerCase().includes(searchTerm)
-    );
-  }
-
-  if (filteredApps.length === 0) {
-    grid.innerHTML = '';
-    noResults.classList.remove('hidden');
-    return;
-  }
-
-  noResults.classList.add('hidden');
-  grid.innerHTML = filteredApps.map(app => `
-    <div class="app-card bg-white rounded-2xl border border-gray-200 overflow-hidden cursor-pointer" onclick="openAppModal(${app.id})">
-      <div class="p-4">
-        <div class="flex gap-3 mb-3">
-          <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover flex-shrink-0">
-          <div class="flex-1 min-w-0">
-            <h3 class="font-bold text-gray-900 text-base mb-1 truncate">${app.name}</h3>
-            <p class="text-xs text-gray-600 mb-2">${app.developer}</p>
-            <div class="flex items-center gap-2 text-xs text-gray-500">
-              <div class="flex items-center gap-1">
-                <i data-lucide="star" class="w-3 h-3 fill-yellow-400 text-yellow-400"></i>
-                <span>${app.rating || '4.0'}</span>
-              </div>
-              <span>•</span>
-              <span>${app.size}</span>
-            </div>
-          </div>
-        </div>
-        <p class="text-sm text-gray-600 line-clamp-2 mb-3">${app.description}</p>
-        <button onclick="event.stopPropagation(); downloadApp(${app.id})" class="w-full bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2">
-          <i data-lucide="download" class="w-4 h-4"></i>
-          <span>تحميل</span>
-        </button>
-      </div>
-    </div>
-  `).join('');
-
-  lucide.createIcons();
-}
-
-function openAppModal(appId) {
-  const app = apps.find(a => a.id === appId);
-  if (!app) return;
-
-  app.views = (app.views || 0) + 1;
-  saveApps();
-
-  const modal = document.getElementById('appModal');
-  const content = document.getElementById('modalContent');
-
-  content.innerHTML = `
-    <div class="relative">
-      <button onclick="closeAppModal()" class="absolute top-4 left-4 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg z-10">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
-      <div class="p-6 md:p-8">
-        <div class="flex flex-col md:flex-row gap-6 mb-6">
-          <img src="${app.icon}" alt="${app.name}" class="w-24 h-24 md:w-32 md:h-32 rounded-3xl object-cover shadow-lg">
-          <div class="flex-1">
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">${app.name}</h2>
-            <p class="text-gray-600 mb-3">${app.developer}</p>
-            <div class="flex items-center gap-4 text-sm text-gray-600 mb-4 flex-wrap">
-              <div class="flex items-center gap-1">
-                <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
-                <span class="font-semibold">${app.rating || '4.0'}</span>
-              </div>
-              <span>•</span>
-              <span>${app.size}</span>
-              <span>•</span>
-              <span>${(app.downloads || 0).toLocaleString('ar-EG')} تحميل</span>
-            </div>
-            <button onclick="downloadApp(${app.id})" class="bg-[#01875f] hover:bg-[#016b47] text-white font-bold px-8 py-3 rounded-xl flex items-center gap-2">
-              <i data-lucide="download" class="w-5 h-5"></i>
-              <span>تحميل الآن</span>
-            </button>
-          </div>
-        </div>
-
-        ${app.screenshots && app.screenshots.length > 0? `
-        <div class="mb-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-3">لقطات الشاشة</h3>
-          <div class="flex gap-3 overflow-x-auto pb-2">
-            ${app.screenshots.map(url => `
-              <img src="${url}" class="h-64 md:h-80 rounded-xl object-cover flex-shrink-0 shadow-md">
-            `).join('')}
-          </div>
-        </div>
-        ` : ''}
-
-        <div class="mb-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-3">الوصف</h3>
-          <p class="text-gray-700 leading-relaxed">${app.description}</p>
-        </div>
-
-        ${app.features && app.features.length > 0? `
-        <div>
-          <h3 class="text-lg font-bold text-gray-900 mb-3">المميزات</h3>
-          <ul class="space-y-2">
-            ${app.features.map(feature => `
-              <li class="flex items-start gap-2 text-gray-700">
-                <i data-lucide="check-circle" class="w-5 h-5 text-[#01875f] flex-shrink-0 mt-0.5"></i>
-                <span>${feature}</span>
-              </li>
-            `).join('')}
-          </ul>
-        </div>
-        ` : ''}
-      </div>
-    </div>
-  `;
-
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-  lucide.createIcons();
-  updateStats();
-}
-
-function closeAppModal() {
-  document.getElementById('appModal').classList.add('hidden');
-  document.getElementById('appModal').classList.remove('flex');
-}
-
-function downloadApp(appId) {
-  const app = apps.find(a => a.id === appId);
-  if (!app) return;
-
-  app.downloads = (app.downloads || 0) + 1;
-  saveApps();
-  updateStats();
-  showToast('جاري التحميل...');
-
-  if (app.downloadUrl && app.downloadUrl!== '#') {
-    window.open(app.downloadUrl, '_blank');
+async function loadAppsFromFirestore() {
+  document.getElementById('loadingApps').classList.remove('hidden');
+  try {
+    const q = query(collection(db, "apps"), orderBy("name"));
+    const querySnapshot = await getDocs(q);
+    allAppsData = {};
+    querySnapshot.forEach((doc) => {
+      allAppsData[doc.id] = { id: doc.id,...doc.data() };
+    });
+    document.getElementById('loadingApps').classList.add('hidden');
+    loadApps(currentSection);
+    updateTotalAppsCount();
+    if (isAdminLoggedIn) updateAdminStats();
+  } catch (error) {
+    console.error('Error:', error);
+    document.getElementById('loadingApps').classList.add('hidden');
+    showToast('خطأ في تحميل التطبيقات');
   }
 }
 
-function showToast(message) {
-  const toast = document.getElementById('toast');
-  document.getElementById('toastMessage').textContent = message;
-  toast.classList.remove('translate-y-20', 'opacity-0');
-  setTimeout(() => {
-    toast.classList.add('translate-y-20', 'opacity-0');
-  }, 3000);
-}
-
-document.getElementById('logoBtn').addEventListener('click', () => {
-  let clickCount = parseInt(localStorage.getItem('logoClicks') || '0');
-  clickCount++;
-  localStorage.setItem('logoClicks', clickCount);
-
-  if (clickCount >= 5) {
-    localStorage.setItem('logoClicks', '0');
-    document.getElementById('adminLoginModal').classList.remove('hidden');
-    document.getElementById('adminLoginModal').classList.add('flex');
-    lucide.createIcons();
-  }
-});
-
-document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+async function handleAddApp(e) {
   e.preventDefault();
-  const password = document.getElementById('adminPassword').value;
-  const errorDiv = document.getElementById('loginError');
+  const editAppId = document.getElementById('editAppId').value;
 
-  if (password === ADMIN_PASSWORD) {
-    isAdmin = true;
-    localStorage.setItem('isAdmin', 'true');
-    closeAdminLogin();
-    checkAdmin();
-    showToast('تم تسجيل الدخول بنجاح');
-  } else {
-    errorDiv.textContent = 'كلمة المرور غير صحيحة';
-    errorDiv.classList.remove('hidden');
-  }
-});
-
-function closeAdminLogin() {
-  document.getElementById('adminLoginModal').classList.add('hidden');
-  document.getElementById('adminLoginModal').classList.remove('flex');
-  document.getElementById('adminPassword').value = '';
-  document.getElementById('loginError').classList.add('hidden');
-}
-
-function closeAdminDashboard() {
-  document.getElementById('adminDashboard').classList.add('hidden');
-  renderApps();
-}
-
-function adminLogout() {
-  isAdmin = false;
-  localStorage.removeItem('isAdmin');
-  closeAdminDashboard();
-  showToast('تم تسجيل الخروج');
-}
-
-function checkAdmin() {
-  if (isAdmin) {
-    document.getElementById('adminDashboard').classList.remove('hidden');
-    renderAdminApps();
-    updateStats();
-    lucide.createIcons();
-  }
-}
-
-document.getElementById('addAppForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const editId = document.getElementById('editAppId').value;
   const appData = {
     name: document.getElementById('appName').value,
     developer: document.getElementById('appDeveloper').value,
@@ -564,64 +347,222 @@ document.getElementById('addAppForm').addEventListener('submit', (e) => {
     icon: document.getElementById('appIcon').value,
     downloadUrl: document.getElementById('appDownloadUrl').value,
     description: document.getElementById('appDescription').value,
-    screenshots: document.getElementById('appScreenshots').value.split('\n').filter(s => s.trim()),
+    screenshots: document.getElementById('appScreenshots').value.split('\n').filter(url => url.trim()),
     features: document.getElementById('appFeatures').value.split('\n').filter(f => f.trim())
   };
 
-  if (editId) {
-    const index = apps.findIndex(a => a.id === parseInt(editId));
-    if (index!== -1) {
-      apps[index] = {...apps[index],...appData };
+  try {
+    if (editAppId) {
+      await updateDoc(doc(db, "apps", editAppId), appData);
       showToast('تم تحديث التطبيق بنجاح');
+      cancelEdit();
+    } else {
+      appData.downloads = 0;
+      appData.views = 0;
+      appData.rating = 5.0;
+      await addDoc(collection(db, "apps"), appData);
+      showToast('تم إضافة التطبيق بنجاح');
     }
-    cancelEdit();
-  } else {
-    appData.id = Date.now();
-    appData.downloads = 0;
-    appData.views = 0;
-    appData.rating = 4.0;
-    appData.dateAdded = new Date().toISOString();
-    apps.push(appData);
-    showToast('تم إضافة التطبيق بنجاح');
+    e.target.reset();
+    loadAppsFromFirestore();
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('خطأ في حفظ التطبيق');
   }
-
-  saveApps();
-  renderAdminApps();
-  updateStats();
-  e.target.reset();
-});
-
-function renderAdminApps() {
-  const filterCategory = document.getElementById('filterCategory').value;
-  let filteredApps = apps;
-
-  if (filterCategory!== 'all') {
-    filteredApps = apps.filter(app => app.category === filterCategory);
-  }
-
-  const list = document.getElementById('appsListAdmin');
-  list.innerHTML = filteredApps.map(app => `
-    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100">
-      <img src="${app.icon}" alt="${app.name}" class="w-14 h-14 rounded-xl object-cover">
-      <div class="flex-1 min-w-0">
-        <h4 class="font-bold text-gray-900 truncate">${app.name}</h4>
-        <p class="text-xs text-gray-600">${app.developer} • ${app.category}</p>
-        <p class="text-xs text-gray-500">${(app.downloads || 0).toLocaleString('ar-EG')} تحميل</p>
-      </div>
-      <div class="flex gap-2">
-        <button onclick="editApp(${app.id})" class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg">
-          <i data-lucide="edit" class="w-4 h-4"></i>
-        </button>
-        <button onclick="deleteApp(${app.id})" class="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">
-          <i data-lucide="trash-2"
-            lucide.createIcons();
 }
 
-function editApp(appId) {
-  const app = apps.find(a => a.id === appId);
+async function trackView(appId) {
+  try {
+    await updateDoc(doc(db, "apps", appId), { views: increment(1) });
+  } catch (error) { console.error('Error:', error); }
+}
+
+async function trackDownload(appId) {
+  try {
+    await updateDoc(doc(db, "apps", appId), { downloads: increment(1) });
+  } catch (error) { console.error('Error:', error); }
+}
+
+function updateTotalAppsCount() {
+  document.getElementById('totalApps').textContent = Object.keys(allAppsData).length;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  loadAppsFromFirestore();
+  setTimeout(() => {
+    const intro = document.getElementById('introScreen');
+    intro.classList.add('intro-fade-out');
+    setTimeout(() => {
+      intro.style.display = 'none';
+      document.getElementById('mainApp').classList.remove('hidden');
+      checkAdminAccess();
+    }, 1000);
+  }, 3000);
+  setupEventListeners();
+});
+
+function setupEventListeners() {
+  document.getElementById('menuBtn').addEventListener('click', openDrawer);
+  document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+  document.getElementById('drawerOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'drawerOverlay') closeDrawer();
+  });
+  document.querySelectorAll('[data-nav]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      switchSection(e.currentTarget.dataset.nav);
+    });
+  });
+  document.querySelectorAll('.drawer-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const page = e.currentTarget.dataset.page;
+      const modal = e.currentTarget.dataset.modal;
+      if (page) { switchSection(page); closeDrawer(); }
+      else if (modal) { showGenericModal(modal); closeDrawer(); }
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input', handleSearch);
+  document.getElementById('appModal').addEventListener('click', (e) => {
+    if (e.target.id === 'appModal') closeAppModal();
+  });
+  document.getElementById('genericModal').addEventListener('click', (e) => {
+    if (e.target.id === 'genericModal') closeGenericModal();
+  });
+  document.getElementById('logoBtn').addEventListener('click', handleLogoClick);
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+      e.preventDefault();
+      showAdminLogin();
+    }
+  });
+  document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+  document.getElementById('addAppForm').addEventListener('submit', handleAddApp);
+}
+
+function handleLogoClick() {
+  logoClickCount++;
+  clearTimeout(logoClickTimer);
+  if (logoClickCount >= 5) {
+    logoClickCount = 0;
+    showAdminLogin();
+  } else {
+    logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
+  }
+}
+
+function checkAdminAccess() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('admin')) showAdminLogin();
+}
+
+function showAdminLogin() {
+  const modal = document.getElementById('adminLoginModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.getElementById('adminPassword').focus();
+  lucide.createIcons();
+}
+
+function closeAdminLogin() {
+  const modal = document.getElementById('adminLoginModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('loginError').classList.add('hidden');
+}
+
+function handleAdminLogin(e) {
+  e.preventDefault();
+  const password = document.getElementById('adminPassword').value;
+  const errorDiv = document.getElementById('loginError');
+  if (password === ADMIN_PASSWORD) {
+    isAdminLoggedIn = true;
+    closeAdminLogin();
+    showAdminDashboard();
+    showToast('تم تسجيل الدخول بنجاح');
+  } else {
+    errorDiv.textContent = 'كلمة المرور غير صحيحة';
+    errorDiv.classList.remove('hidden');
+    document.getElementById('adminPassword').value = '';
+  }
+}
+
+function showAdminDashboard() {
+  document.getElementById('adminDashboard').classList.remove('hidden');
+  updateAdminStats();
+  lucide.createIcons();
+}
+
+window.closeAdminDashboard = function() {
+  document.getElementById('adminDashboard').classList.add('hidden');
+}
+
+window.adminLogout = function() {
+  isAdminLoggedIn = false;
+  closeAdminDashboard();
+  showToast('تم تسجيل الخروج');
+}
+
+function updateAdminStats() {
+  const apps = Object.values(allAppsData);
+  document.getElementById('totalDownloads').textContent = apps.reduce((sum, app) => sum + (app.downloads || 0), 0);
+  document.getElementById('totalViews').textContent = apps.reduce((sum, app) => sum + (app.views || 0), 0);
+  renderAppsListAdmin('all');
+  lucide.createIcons();
+}
+
+function renderAppsListAdmin(category) {
+  const apps = Object.values(allAppsData);
+  const filtered = category === 'all'? apps : apps.filter(app => app.category === category);
+  const appsListAdmin = document.getElementById('appsListAdmin');
+
+  if (filtered.length === 0) {
+    appsListAdmin.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">لا توجد تطبيقات في هذا القسم</p>';
+    return;
+  }
+
+  appsListAdmin.innerHTML = filtered.map(app => `
+    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
+        <img src="${app.icon}" alt="${app.name}" class="w-12 h-12 rounded-xl object-cover flex-shrink-0" onerror="this.src='https://via.placeholder.com/48'">
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-gray-900 text-sm truncate">${app.name}</p>
+          <div class="flex items-center gap-2 text-xs text-gray-500 mt-1 flex-wrap">
+            <span class="px-2 py-0.5 bg-green-100 text-[#01875f] rounded-full font-semibold">${getCategoryName(app.category)}</span>
+            <span>•</span>
+            <span>${app.downloads || 0} تحميل</span>
+            <span>•</span>
+            <span>${app.views || 0} مشاهدة</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="editApp('${app.id}')" class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1">
+          <i data-lucide="edit" class="w-4 h-4"></i>
+          <span>تعديل</span>
+        </button>
+        <button onclick="deleteApp('${app.id}', '${app.name}')" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>حذف</span>
+        </button>
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+window.filterAppsByCategory = function() {
+  const category = document.getElementById('filterCategory').value;
+  renderAppsListAdmin(category);
+}
+
+window.editApp = function(appId) {
+  const app = allAppsData[appId];
   if (!app) return;
 
-  document.getElementById('editAppId').value = app.id;
+  isEditMode = true;
+  document.getElementById('editAppId').value = appId;
   document.getElementById('appName').value = app.name;
   document.getElementById('appDeveloper').value = app.developer;
   document.getElementById('appCategory').value = app.category;
@@ -629,161 +570,298 @@ function editApp(appId) {
   document.getElementById('appIcon').value = app.icon;
   document.getElementById('appDownloadUrl').value = app.downloadUrl;
   document.getElementById('appDescription').value = app.description;
-  document.getElementById('appScreenshots').value = (app.screenshots || []).join('\n');
-  document.getElementById('appFeatures').value = (app.features || []).join('\n');
+  document.getElementById('appScreenshots').value = app.screenshots? app.screenshots.join('\n') : '';
+  document.getElementById('appFeatures').value = app.features? app.features.join('\n') : '';
 
   document.getElementById('formTitle').textContent = 'تعديل التطبيق';
-  document.getElementById('submitBtnText').textContent = 'حفظ التعديلات';
+  document.getElementById('submitBtnText').textContent = 'تحديث التطبيق';
   document.getElementById('cancelEditBtn').classList.remove('hidden');
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('addAppForm').scrollIntoView({ behavior: 'smooth' });
+  showToast('عدل البيانات ودوس تحديث');
+  lucide.createIcons();
 }
 
-function cancelEdit() {
+window.cancelEdit = function() {
+  isEditMode = false;
   document.getElementById('addAppForm').reset();
   document.getElementById('editAppId').value = '';
   document.getElementById('formTitle').textContent = 'إضافة تطبيق جديد';
   document.getElementById('submitBtnText').textContent = 'إضافة التطبيق';
   document.getElementById('cancelEditBtn').classList.add('hidden');
+  showToast('تم إلغاء التعديل');
 }
 
-function deleteApp(appId) {
-  if (confirm('هل أنت متأكد من حذف هذا التطبيق؟')) {
-    apps = apps.filter(a => a.id!== appId);
-    saveApps();
-    renderAdminApps();
-    updateStats();
-    showToast('تم حذف التطبيق');
+window.deleteApp = async function(appId, appName) {
+  if (confirm(`متأكد عايز تحذف ${appName}؟\nمش هتعرف ترجعه تاني!`)) {
+    try {
+      await deleteDoc(doc(db, "apps", appId));
+      showToast('تم حذف التطبيق بنجاح');
+      loadAppsFromFirestore();
+    } catch (error) {
+      console.error('Error:', error);
+      showToast('خطأ في حذف التطبيق');
+    }
   }
 }
 
-function filterAppsByCategory() {
-  renderAdminApps();
-}
-
-// Navigation
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentCategory = btn.dataset.nav;
-
-    const titles = {
-      home: ['التطبيقات المميزة', 'اكتشف أفضل التطبيقات'],
-      games: ['الألعاب', 'أفضل الألعاب الممتعة'],
-      apps: ['التطبيقات', 'تطبيقات مفيدة لحياتك'],
-      kids: ['تطبيقات الأطفال', 'آمنة وممتعة للأطفال']
-    };
-
-    document.getElementById('sectionTitle').textContent = titles[currentCategory][0];
-    document.getElementById('sectionDesc').textContent = titles[currentCategory][1];
-    renderApps(currentCategory);
-  });
-});
-
-// Search
-let searchTimeout;
-document.getElementById('searchInput').addEventListener('input', () => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    renderApps(currentCategory);
-  }, 300);
-});
-
-// Drawer
-document.getElementById('menuBtn').addEventListener('click', () => {
-  document.getElementById('drawerOverlay').classList.remove('hidden');
+function openDrawer() {
+  const overlay = document.getElementById('drawerOverlay');
+  const drawer = document.getElementById('drawer');
+  overlay.classList.remove('hidden');
   setTimeout(() => {
-    document.getElementById('drawerOverlay').classList.remove('opacity-0');
-    document.getElementById('drawer').classList.remove('translate-x-full');
+    overlay.classList.remove('opacity-0');
+    drawer.classList.remove('translate-x-full');
   }, 10);
-});
-
-document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
-document.getElementById('drawerOverlay').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('drawerOverlay')) closeDrawer();
-});
+}
 
 function closeDrawer() {
-  document.getElementById('drawer').classList.add('translate-x-full');
-  document.getElementById('drawerOverlay').classList.add('opacity-0');
-  setTimeout(() => {
-    document.getElementById('drawerOverlay').classList.add('hidden');
-  }, 300);
+  const overlay = document.getElementById('drawerOverlay');
+  const drawer = document.getElementById('drawer');
+  overlay.classList.add('opacity-0');
+  drawer.classList.add('translate-x-full');
+  setTimeout(() => overlay.classList.add('hidden'), 300);
 }
 
-// Generic Modal
-document.querySelectorAll('[data-modal]').forEach(link => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    const modalType = link.dataset.modal;
-    const modal = document.getElementById('genericModal');
-    const content = document.getElementById('genericModalContent');
-
-    if (modalType === 'about') {
-      content.innerHTML = `
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-2xl font-bold text-gray-900">حول المتجر</h3>
-            <button onclick="closeGenericModal()" class="p-2 hover:bg-gray-100 rounded-full">
-              <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-          </div>
-          <p class="text-gray-700 leading-relaxed mb-4">
-            MOHAMED PLAY STORE هو متجر تطبيقات شخصي من تطوير MOHAMED GHARIB.
-          </p>
-          <p class="text-gray-700 leading-relaxed">
-            يحتوي على مجموعة من التطبيقات والألعاب المميزة. اضغط 5 مرات على اللوجو للدخول للوحة التحكم.
-          </p>
-          <p class="text-sm text-gray-500 mt-4">كلمة المرور الافتراضية: mohamed123</p>
-        </div>
-      `;
-    } else if (modalType === 'contact') {
-      content.innerHTML = `
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-2xl font-bold text-gray-900">تواصل معنا</h3>
-            <button onclick="closeGenericModal()" class="p-2 hover:bg-gray-100 rounded-full">
-              <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-          </div>
-          <div class="space-y-3">
-            <a href="mailto:mohamed@example.com" class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100">
-              <i data-lucide="mail" class="w-5 h-5 text-[#01875f]"></i>
-              <span>mohamed@example.com</span>
-            </a>
-          </div>
-        </div>
-      `;
+function switchSection(section) {
+  currentSection = section;
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active', 'text-[#01875f]');
+    btn.classList.add('text-gray-600');
+    if (btn.dataset.nav === section) {
+      btn.classList.add('active', 'text-[#01875f]');
+      btn.classList.remove('text-gray-600');
     }
-
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    lucide.createIcons();
-    closeDrawer();
   });
-});
-
-function closeGenericModal() {
-  document.getElementById('genericModal').classList.add('hidden');
-  document.getElementById('genericModal').classList.remove('flex');
+  const titles = {
+    home: { title: 'التطبيقات المميزة', desc: 'اكتشف أفضل التطبيقات' },
+    games: { title: 'الألعاب', desc: 'مجموعة من الألعاب الممتعة' },
+    apps: { title: 'التطبيقات', desc: 'تطبيقات عملية' },
+    kids: { title: 'تطبيقات الأطفال', desc: 'محتوى آمن وتعليمي' }
+  };
+  document.getElementById('sectionTitle').textContent = titles[section].title;
+  document.getElementById('sectionDesc').textContent = titles[section].desc;
+  document.getElementById('searchInput').value = '';
+  loadApps(section);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Init
-window.addEventListener('load', () => {
+function loadApps(section, searchTerm = '') {
+  const apps = Object.values(allAppsData);
+  let appsToShow = section === 'home'? apps : apps.filter(app => app.category === section);
+  filteredApps = searchTerm? appsToShow.filter(app =>
+    app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.developer.toLowerCase().includes(searchTerm.toLowerCase())
+  ) : appsToShow;
+  renderApps(filteredApps);
+}
+
+function renderApps(apps) {
+  const grid = document.getElementById('appsGrid');
+  const noResults = document.getElementById('noResults');
+  if (apps.length === 0) {
+    grid.innerHTML = '';
+    noResults.classList.remove('hidden');
+    return;
+  }
+  noResults.classList.add('hidden');
+  grid.innerHTML = apps.map(app => `
+    <div class="app-card bg-white rounded-2xl p-4 cursor-pointer border border-gray-200" onclick="showAppDetail('${app.id}')">
+      <div class="flex gap-3 mb-3">
+        <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover flex-shrink-0" onerror="this.src='https://via.placeholder.com/64'">
+        <div class="flex-1 min-w-0">
+          <h3 class="font-bold text-gray-900 text-base mb-1 truncate">${app.name}</h3>
+          <p class="text-sm text-gray-600 mb-1">${app.developer}</p>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="flex items-center gap-1">
+              <span>${app.rating}</span>
+              <i data-lucide="star" class="w-3 h-3 fill-yellow-400 text-yellow-400"></i>
+            </span>
+            <span>•</span>
+            <span>${app.size}</span>
+          </div>
+        </div>
+      <p class="text-xs text-gray-600 mb-3 line-clamp-2">${app.description}</p>
+      <div class="flex gap-2">
+        <span class="px-3 py-1 bg-green-50 text-[#01875f] text-xs font-semibold rounded-full">${getCategoryName(app.category)}</span>
+        <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">${app.downloads || 0} تحميل</span>
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+function getCategoryName(cat) {
+  const names = { home: 'مميز', games: 'ألعاب', apps: 'تطبيقات', kids: 'أطفال' };
+  return names[cat] || cat;
+}
+
+function handleSearch(e) {
+  loadApps(currentSection, e.target.value.trim());
+}
+
+window.showAppDetail = function(appId) {
+  const app = allAppsData[appId];
+  if (!app) return;
+  trackView(appId);
+  const modal = document.getElementById('appModal');
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-4 flex items-center justify-between z-10">
+        <button onclick="closeAppModal()" class="p-2 hover:bg-gray-100 rounded-full">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <button onclick="shareApp('${appId}')" class="p-2 hover:bg-gray-100 rounded-full">
+          <i data-lucide="share-2" class="w-5 h-5 text-gray-700"></i>
+        </button>
+      </div>
+      <div class="p-4 md:p-6">
+        <div class="flex gap-4 mb-6">
+          <img src="${app.icon}" alt="${app.name}" class="w-20 h-20 md:w-24 md:h-24 rounded-3xl object-cover flex-shrink-0 shadow-lg" onerror="this.src='https://via.placeholder.com/96'">
+          <div class="flex-1 min-w-0">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-1">${app.name}</h2>
+            <p class="text-sm md:text-base text-[#01875f] font-semibold mb-2">${app.developer}</p>
+            <div class="flex items-center gap-3 text-sm text-gray-600">
+              <span class="flex items-center gap-1">
+                <span class="font-bold text-gray-900">${app.rating}</span>
+                <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
+              </span>
+              <span>${app.downloads || 0} تنزيل</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="downloadApp('${appId}', '${app.name}', '${app.downloadUrl}')" class="w-full bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-3.5 rounded-full mb-6 text-lg">تحميل الآن</button>
+        ${app.screenshots && app.screenshots.length > 0? `
+        <div class="mb-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-3">لقطات الشاشة</h3>
+          <div class="flex gap-3 overflow-x-auto pb-2">
+            ${app.screenshots.map(shot => `<img src="${shot}" alt="Screenshot" class="h-80 md:h-96 rounded-2xl border border-gray-200 flex-shrink-0" onerror="this.style.display='none'">`).join('')}
+          </div>
+        </div>` : ''}
+        <div class="mb-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-3">حول هذا التطبيق</h3>
+          <p class="text-gray-700 leading-relaxed mb-4">${app.description}</p>
+          ${app.features && app.features.length > 0? `
+          <div class="space-y-2">
+            ${app.features.map(feature => `
+              <div class="flex items-center gap-2 text-gray-700">
+                <i data-lucide="check-circle" class="w-5 h-5 text-[#01875f] flex-shrink-0"></i>
+                <span>${feature}</span>
+              </div>
+            `).join('')}
+          </div>` : ''}
+        </div>
+        <div class="border-t border-gray-200 pt-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">معلومات التطبيق</h3>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-gray-500 mb-1">الحجم</p>
+              <p class="font-semibold text-gray-900">${app.size}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-1">التصنيف</p>
+              <p class="font-semibold text-gray-900">${getCategoryName(app.category)}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-1">التنزيلات</p>
+              <p class="font-semibold text-gray-900">${app.downloads || 0}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-1">المشاهدات</p>
+              <p class="font-semibold text-gray-900">${app.views || 0}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  lucide.createIcons();
+  document.body.style.overflow = 'hidden';
+}
+
+window.downloadApp = function(appId, appName, downloadUrl) {
+  trackDownload(appId);
+  showToast(`جاري تحميل ${appName}...`);
+  window.open(downloadUrl, '_blank');
+  closeAppModal();
+}
+
+window.shareApp = function(appId) {
+  const url = `${window.location.origin}${window.location.pathname}?app=${appId}`;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('تم نسخ رابط التطبيق');
+  });
+}
+
+window.closeAppModal = function() {
+  const modal = document.getElementById('appModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+
+function showGenericModal(type) {
+  const modal = document.getElementById('genericModal');
+  const content = document.getElementById('genericModalContent');
+  const modals = {
+    about: {
+      title: 'حول المتجر',
+      content: `
+        <p class="text-gray-700 leading-relaxed mb-4">مرحباً بك في MOHAMED PLAY STORE، المتجر المتخصص في التطبيقات.</p>
+        <div class="bg-green-50 rounded-xl p-4 mt-6">
+          <p class="text-sm text-[#01875f] font-semibold">✨ هدفنا: انشاء تطبيقات مجانيه ومفيده للجميع</p>
+        </div>
+      `
+    },
+    contact: {
+      title: 'تواصل معنا',
+      content: `
+        <div class="text-center space-y-6 py-8">
+          <div class="text-6xl mb-4">📧</div>
+          <h3 class="text-2xl font-bold text-gray-800">نحب نسمع منك</h3>
+          <p class="text-gray-600 max-w-md mx-auto">عندك سؤال أو اقتراح؟ ابعتلنا رسالتك</p>
+          <a href="https://forms.gle/JwVejZHpeZJxx9Er5" target="_blank" class="inline-block bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-4 px-8 rounded-xl text-lg">افتح فورم التواصل</a>
+          <p class="text-sm text-gray-500">هيفتح في صفحة جديدة</p>
+        </div>
+      `
+    }
+  };
+  const modalData = modals[type];
+  content.innerHTML = `
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-gray-900">${modalData.title}</h3>
+        <button onclick="closeGenericModal()" class="p-2 hover:bg-gray-100 rounded-full">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div>${modalData.content}</div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  lucide.createIcons();
+}
+
+window.closeGenericModal = function() {
+  const modal = document.getElementById('genericModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  toastMessage.textContent = message;
+  toast.classList.remove('translate-y-20', 'opacity-0');
   setTimeout(() => {
-    document.getElementById('introScreen').classList.add('intro-fade-out');
-    setTimeout(() => {
-      document.getElementById('introScreen').style.display = 'none';
-      document.getElementById('mainApp').classList.remove('hidden');
-      renderApps();
-      lucide.createIcons();
-    }, 1000);
-  }, 2000);
-});
-
-lucide.createIcons();
+    toast.classList.add('translate-y-20', 'opacity-0');
+  }, 3000);
+  lucide.createIcons();
+}
 </script>
-
 </body>
 </html>
