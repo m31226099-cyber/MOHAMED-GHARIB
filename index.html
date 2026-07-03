@@ -10,140 +10,39 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
-  * {
-    font-family: 'Cairo', sans-serif;
-  }
-  
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  body {
-    overflow-x: hidden;
-  }
-  
-  .rainbow-text {
-    background: linear-gradient(90deg, #ff0080, #ff8c00, #ffed00, #00ff00, #00ffee, #0080ff, #8000ff, #ff0080);
-    background-size: 400% 100%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: rainbow 3s linear infinite;
-  }
-  
-  @keyframes rainbow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 100% 50%; }
-  }
-  
-  .intro-fade-out {
-    animation: fadeOut 1s ease-in-out forwards;
-  }
-  
-  @keyframes fadeOut {
-    to {
-      opacity: 0;
-      visibility: hidden;
-    }
-  }
-  
-  .app-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .app-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  }
-  
-  .nav-btn.active {
-    color: #01875f;
-    position: relative;
-  }
-  
-  .nav-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 3px;
-    background: #01875f;
-    border-radius: 2px;
-  }
-  
-  .drawer-overlay, .modal-backdrop {
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-  }
-  
-  .screenshot-scroll::-webkit-scrollbar {
-    height: 6px;
-  }
-  
-  .screenshot-scroll::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-  
-  .screenshot-scroll::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 10px;
-  }
-  
-  .screenshot-scroll::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-  }
-  
-  .stat-card {
-    transition: all 0.3s ease;
-  }
-  
-  .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  }
-  
-  @media (max-width: 390px) {
-    .app-card {
-      min-width: 0;
-    }
-  }
-  
-  .dark body, .dark .bg-white {
-    background: #1a1a1a !important;
-    color: #e5e5e5;
-  }
-  
-  .dark .text-gray-900 { color: #f5f5f5 !important; }
-  .dark .text-gray-800 { color: #e5e5e5 !important; }
-  .dark .text-gray-700 { color: #d4d4d4 !important; }
-  .dark .text-gray-600 { color: #a3a3a3 !important; }
-  .dark .text-gray-500 { color: #737373 !important; }
-  .dark .border-gray-200 { border-color: #333 !important; }
-  .dark .bg-gray-100 { background: #262626 !important; }
-  .dark .bg-gray-50 { background: #262626 !important; }
-  .dark input, .dark textarea, .dark select { 
-    background: #262626 !important; 
-    border-color: #404040 !important;
-    color: #e5e5e5 !important;
-  }
-  
-  .loader {
-    border-top-color: #01875f;
-    animation: spinner 0.6s linear infinite;
-  }
-  
-  @keyframes spinner {
-    to { transform: rotate(360deg); }
-  }
+* { font-family: 'Cairo', sans-serif; }
+html { scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+.rainbow-text {
+  background: linear-gradient(90deg, #ff0080, #ff8c00, #ffed00, #00ff00, #00ffee, #0080ff, #8000ff, #ff0080);
+  background-size: 400% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow 3s linear infinite;
+}
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+.intro-fade-out { animation: fadeOut 1s ease-in-out forwards; }
+@keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+.app-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.app-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+.nav-btn.active { color: #01875f; position: relative; }
+.nav-btn.active::after {
+  content: ''; position: absolute; bottom: -8px; left: 50%;
+  transform: translateX(-50%); width: 30px; height: 3px;
+  background: #01875f; border-radius: 2px;
+}
+.drawer-overlay,.modal-backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+.loader { border-top-color: #01875f; animation: spinner 0.6s linear infinite; }
+@keyframes spinner { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body class="bg-white">
 
-<!-- Intro Screen -->
-<div id="introScreen" class="fixed inset-0 bg-black z-50 flex items-center justify-center transition-opacity duration-1000">
+<div id="introScreen" class="fixed inset-0 bg-black z-50 flex items-center justify-center">
   <div class="text-center px-4">
     <h1 class="text-4xl md:text-7xl font-extrabold rainbow-text mb-6">MOHAMED PLAY STORE</h1>
     <p class="text-gray-400 text-lg md:text-xl">متجر التطبيقات المصنوعة بـواسطه MOHAMED GHARIB</p>
@@ -153,9 +52,8 @@
   </div>
 </div>
 
-<!-- Admin Login Modal -->
 <div id="adminLoginModal" class="fixed inset-0 modal-backdrop z-[60] hidden items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300" id="adminLoginContent">
+  <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6" id="adminLoginContent">
     <div class="text-center mb-6">
       <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
         <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
@@ -169,46 +67,29 @@
         <input type="password" id="adminPassword" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="أدخل كلمة المرور">
       </div>
       <div id="loginError" class="hidden mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl"></div>
-      <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 rounded-xl transition-all">
-        دخول
-      </button>
-      <button type="button" onclick="closeAdminLogin()" class="w-full mt-3 text-gray-600 font-semibold py-2 rounded-xl hover:bg-gray-100 transition-colors">
-        إلغاء
-      </button>
+      <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl">دخول</button>
+      <button type="button" onclick="closeAdminLogin()" class="w-full mt-3 text-gray-600 font-semibold py-2 rounded-xl hover:bg-gray-100">إلغاء</button>
     </form>
   </div>
 </div>
 
-<!-- Admin Dashboard -->
 <div id="adminDashboard" class="fixed inset-0 bg-gray-50 z-[55] hidden overflow-y-auto">
   <div class="max-w-7xl mx-auto p-4 md:p-6">
-    <!-- Admin Header -->
     <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 mb-6 text-white shadow-xl">
       <div class="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 class="text-2xl md:text-3xl font-bold mb-2">لوحة تحكم المشرف</h2>
-          <p class="text-purple-100">إدارة المتجر والإحصائيات</p>
+          <p class="text-purple-100">إدارة المتجر</p>
         </div>
         <div class="flex gap-2">
-          <button onclick="adminLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-semibold transition-colors flex items-center gap-2">
+          <button onclick="adminLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-semibold flex items-center gap-2">
             <i data-lucide="log-out" class="w-4 h-4"></i>
             <span>خروج</span>
           </button>
-          <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-white text-purple-600 hover:bg-purple-50 rounded-xl font-semibold transition-colors">
-            إغلاق
-          </button>
+          <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-white text-purple-600 rounded-xl font-semibold">إغلاق</button>
         </div>
       </div>
-      
-      <!-- Live Stats -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-        <div class="bg-white/10 backdrop-blur rounded-xl p-4">
-          <div class="flex items-center gap-2 mb-1">
-            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <p class="text-sm text-purple-100">متصلين الآن</p>
-          </div>
-          <p class="text-3xl font-bold" id="onlineUsersCount">0</p>
-        </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
         <div class="bg-white/10 backdrop-blur rounded-xl p-4">
           <p class="text-sm text-purple-100 mb-1">إجمالي التحميلات</p>
           <p class="text-3xl font-bold" id="totalDownloads">0</p>
@@ -224,7 +105,6 @@
       </div>
     </div>
 
-    <!-- Add New App Form -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-6">
       <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
         <i data-lucide="plus-circle" class="w-5 h-5 text-[#01875f]"></i>
@@ -234,11 +114,11 @@
         <div class="grid md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">اسم التطبيق *</label>
-            <input type="text" id="appName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]" placeholder="مثال: تطبيق رائع">
+            <input type="text" id="appName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]">
           </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">المطور *</label>
-            <input type="text" id="appDeveloper" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]" placeholder="اسم المطور">
+            <input type="text" id="appDeveloper" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]">
           </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">التصنيف *</label>
@@ -252,101 +132,51 @@
           </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">الحجم *</label>
-            <input type="text" id="appSize" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]" placeholder="مثال: 10.5 MB">
+            <input type="text" id="appSize" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]" placeholder="10.5 MB">
           </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">رابط الأيقونة *</label>
-            <input type="url" id="appIcon" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]" placeholder="https://example.com/icon.png">
+            <input type="url" id="appIcon" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]">
           </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">رابط التحميل *</label>
-            <input type="url" id="appDownloadUrl" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]" placeholder="https://example.com/app.apk">
+            <input type="url" id="appDownloadUrl" required class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f]">
           </div>
         </div>
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">الوصف *</label>
-          <textarea id="appDescription" required rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f] resize-none" placeholder="وصف التطبيق ومميزاته"></textarea>
+          <textarea id="appDescription" required rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f] resize-none"></textarea>
         </div>
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">صور لقطات الشاشة (رابط واحد في كل سطر)</label>
-          <textarea id="appScreenshots" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f] resize-none" placeholder="https://example.com/shot1.png&#10;https://example.com/shot2.png"></textarea>
+          <textarea id="appScreenshots" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f] resize-none"></textarea>
         </div>
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">المميزات (مميزة واحدة في كل سطر)</label>
-          <textarea id="appFeatures" rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f] resize-none" placeholder="واجهة سهلة&#10;بدون إنترنت&#10;مجاني بالكامل"></textarea>
+          <textarea id="appFeatures" rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f] resize-none"></textarea>
         </div>
-        <button type="submit" class="w-full bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2">
+        <button type="submit" class="w-full bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2">
           <i data-lucide="plus" class="w-5 h-5"></i>
           <span>إضافة التطبيق</span>
         </button>
       </form>
     </div>
-
-    <div class="grid md:grid-cols-2 gap-6 mb-6">
-      <!-- Downloads Per App -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <i data-lucide="download" class="w-5 h-5 text-[#01875f]"></i>
-          التحميلات لكل تطبيق
-        </h3>
-        <div id="downloadsList" class="space-y-3 max-h-96 overflow-y-auto"></div>
-      </div>
-
-      <!-- Most Viewed Apps -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <i data-lucide="eye" class="w-5 h-5 text-blue-500"></i>
-          التطبيقات الأكثر مشاهدة
-        </h3>
-        <div id="viewsList" class="space-y-3 max-h-96 overflow-y-auto"></div>
-      </div>
-    </div>
-
-    <!-- Recent Activity -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-      <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <i data-lucide="activity" class="w-5 h-5 text-purple-500"></i>
-        النشاط الأخير
-      </h3>
-      <div id="recentActivity" class="space-y-2 max-h-96 overflow-y-auto"></div>
-    </div>
   </div>
 </div>
 
-<!-- Main App -->
 <div id="mainApp" class="hidden min-h-screen flex flex-col">
-  
-  <!-- Online Users Badge -->
-  <div id="onlineBadge" class="fixed top-20 md:top-24 left-4 z-30 bg-green-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1.5">
-    <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-    <span id="onlineBadgeCount">0</span>
-    <span>متصلين</span>
-  </div>
-  
-  <!-- Header -->
   <header class="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
     <div class="mx-auto px-3 md:px-6 py-3">
       <div class="flex items-center justify-between gap-3">
-        
-        <!-- Hamburger Menu -->
-        <button id="menuBtn" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+        <button id="menuBtn" class="p-2 hover:bg-gray-100 rounded-full">
           <i data-lucide="menu" class="w-6 h-6 text-gray-700"></i>
         </button>
-        
-        <!-- Search Bar -->
         <div class="flex-1 max-w-3xl">
           <div class="relative">
-            <input 
-              type="text" 
-              id="searchInput"
-              placeholder="البحث عن التطبيقات والألعاب"
-              class="w-full px-4 py-2.5 pr-11 bg-gray-100 border-0 rounded-full text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#01875f] focus:bg-white transition-all"
-            >
+            <input type="text" id="searchInput" placeholder="البحث عن التطبيقات والألعاب" class="w-full px-4 py-2.5 pr-11 bg-gray-100 border-0 rounded-full text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#01875f] focus:bg-white">
             <i data-lucide="search" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"></i>
           </div>
         </div>
-        
-        <!-- Logo -->
         <div class="flex items-center gap-2 flex-shrink-0">
           <h1 id="logoBtn" class="text-lg md:text-2xl font-extrabold cursor-pointer select-none">
             <span class="rainbow-text">MOHAMED</span>
@@ -357,974 +187,556 @@
     </div>
   </header>
 
-  <!-- Side Drawer -->
   <div id="drawerOverlay" class="fixed inset-0 drawer-overlay z-50 hidden opacity-0 transition-opacity duration-300">
     <div id="drawer" class="absolute right-0 top-0 h-full w-72 md:w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300">
       <div class="p-6 border-b border-gray-200">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-bold text-gray-800">القائمة</h2>
-          <button id="closeDrawer" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <button id="closeDrawer" class="p-2 hover:bg-gray-100 rounded-full">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
         <p class="text-sm text-gray-600">متجر تطبيقات MOHAMED</p>
       </div>
       <nav class="p-4">
-        <a href="#" data-page="home" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-800 transition-colors mb-2">
+        <a href="#" data-page="home" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-800 mb-2">
           <i data-lucide="home" class="w-5 h-5"></i>
           <span class="font-semibold">الرئيسية</span>
         </a>
-        <a href="#" data-modal="about" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-800 transition-colors mb-2">
+        <a href="#" data-modal="about" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-800 mb-2">
           <i data-lucide="info" class="w-5 h-5"></i>
           <span class="font-semibold">حول</span>
         </a>
-        <a href="#" data-modal="settings" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-800 transition-colors mb-2">
-          <i data-lucide="settings" class="w-5 h-5"></i>
-          <span class="font-semibold">الإعدادات</span>
-        </a>
-        <a href="#" data-modal="contact" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-800 transition-colors mb-2">
+        <a href="#" data-modal="contact" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-800 mb-2">
           <i data-lucide="mail" class="w-5 h-5"></i>
           <span class="font-semibold">تواصل معنا</span>
         </a>
       </nav>
-      <div class="absolute bottom-0 right-0 left-0 p-6 border-t border-gray-200">
-        <p class="text-xs text-gray-500 text-center">الإصدار 2.0.0 | © 2024 MOHAMED</p>
-      </div>
     </div>
   </div>
 
-  <!-- Main Content -->
   <main class="flex-1 pb-20 md:pb-6">
     <div class="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
-      
-      <!-- Section Title -->
       <div class="mb-6">
         <h2 id="sectionTitle" class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">التطبيقات المميزة</h2>
-        <p id="sectionDesc" class="text-gray-600 text-sm md:text-base">اكتشف أفضل التطبيقات المصنوعة بـواسطه MOHAMED GHARIB</p>
+        <p id="sectionDesc" class="text-gray-600 text-sm md:text-base">اكتشف أفضل التطبيقات</p>
       </div>
-      
-      <!-- Loading -->
       <div id="loadingApps" class="hidden text-center py-16">
         <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 mx-auto mb-4"></div>
         <p class="text-gray-500">جاري تحميل التطبيقات...</p>
       </div>
-      
-      <!-- Apps Grid -->
-      <div id="appsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
-      </div>
-      
-      <!-- No Results -->
+      <div id="appsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5"></div>
       <div id="noResults" class="hidden text-center py-16">
         <i data-lucide="search-x" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
         <h3 class="text-xl font-bold text-gray-700 mb-2">لا توجد نتائج</h3>
         <p class="text-gray-500">جرب البحث بكلمات مختلفة</p>
       </div>
-      
     </div>
   </main>
 
-  <!-- Bottom Navigation -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 md:hidden">
     <div class="flex items-center justify-around py-2">
-      <button data-nav="home" class="nav-btn active flex flex-col items-center gap-1 px-4 py-2 transition-colors">
+      <button data-nav="home" class="nav-btn active flex flex-col items-center gap-1 px-4 py-2">
         <i data-lucide="layout-grid" class="w-5 h-5"></i>
         <span class="text-xs font-semibold">الرئيسية</span>
       </button>
-      <button data-nav="games" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600 transition-colors">
+      <button data-nav="games" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600">
         <i data-lucide="gamepad-2" class="w-5 h-5"></i>
         <span class="text-xs font-semibold">الألعاب</span>
       </button>
-      <button data-nav="apps" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600 transition-colors">
+      <button data-nav="apps" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600">
         <i data-lucide="smartphone" class="w-5 h-5"></i>
         <span class="text-xs font-semibold">التطبيقات</span>
       </button>
-      <button data-nav="kids" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600 transition-colors">
+      <button data-nav="kids" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600">
         <i data-lucide="baby" class="w-5 h-5"></i>
         <span class="text-xs font-semibold">الأطفال</span>
       </button>
     </div>
   </nav>
-
-  <!-- Desktop Navigation Tabs -->
-  <div class="hidden md:block bg-white border-b border-gray-200 sticky top-[57px] z-30">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="flex gap-8">
-        <button data-nav="home" class="nav-btn active py-4 font-semibold text-sm transition-colors">الرئيسية</button>
-        <button data-nav="games" class="nav-btn py-4 font-semibold text-sm text-gray-600 transition-colors">الألعاب</button>
-        <button data-nav="apps" class="nav-btn py-4 font-semibold text-sm text-gray-600 transition-colors">التطبيقات</button>
-        <button data-nav="kids" class="nav-btn py-4 font-semibold text-sm text-gray-600 transition-colors">الأطفال</button>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- App Detail Modal -->
 <div id="appModal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-3 md:p-6">
-  <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
-  </div>
+  <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl" id="modalContent"></div>
 </div>
 
-<!-- Generic Modal -->
 <div id="genericModal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="genericModalContent">
-  </div>
+  <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl" id="genericModalContent"></div>
 </div>
 
-<!-- Toast Notification -->
-<div id="toast" class="fixed bottom-24 md:bottom-6 right-4 left-4 md:right-auto md:left-auto md:max-w-sm bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[70]">
+<div id="toast" class="fixed bottom-24 md:bottom-6 right-4 left-4 md:right-auto md:max-w-sm bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[70]">
   <div class="flex items-center gap-3">
     <i data-lucide="check-circle" class="w-5 h-5 text-green-400 flex-shrink-0"></i>
     <p id="toastMessage" class="font-semibold"></p>
   </div>
 </div>
-
 <script type="module">
-  // ============================================
-  // FIREBASE CONFIGURATION
-  // ============================================
-  // IMPORTANT: Replace with your Firebase project config
-  // 1. Go to https://console.firebase.google.com
-  // 2. Create a new project or select existing
-  // 3. Go to Project Settings > General > Your apps > Web app
-  // 4. Copy the firebaseConfig object and replace below
-  // 5. In Firebase Console > Realtime Database > Create Database
-  // 6. Set rules to: { "rules": { ".read": true, ".write": true } } for testing
-  //    For production, secure your rules properly!
-  // ============================================
-  
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getDatabase, ref, set, get, onValue, serverTimestamp, onDisconnect, push, increment, runTransaction } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, orderBy, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
- const firebaseConfig = {
-    apiKey: "AIzaSyDSxk0kXJGs__nmtF4V4V_Ro_kkBhzE6IA",
-    authDomain: "mohamed-play-store.firebaseapp.com",
-    databaseURL: "https://mohamed-play-store-default-rtdb.firebaseio.com",
-    projectId: "mohamed-play-store",
-    storageBucket: "mohamed-play-store.firebasestorage.app",
-    messagingSenderId: "966596585443",
-    appId: "1:966596585443:web:ac43976b53e72225ee62d6",
-    measurementId: "G-7YGR8TGCMW"
+const firebaseConfig = {
+  apiKey: "AIzaSyDSxk0kXJGs__nmtF4V4V_Ro_kkBhzE6IA",
+  authDomain: "mohamed-play-store.firebaseapp.com",
+  projectId: "mohamed-play-store",
+  storageBucket: "mohamed-play-store.firebasestorage.app",
+  messagingSenderId: "966596585443",
+  appId: "1:966596585443:web:ac43976b53e72225ee62d6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const ADMIN_PASSWORD = 'mohamed123';
+let currentSection = 'home';
+let filteredApps = [];
+let logoClickCount = 0;
+let logoClickTimer = null;
+let isAdminLoggedIn = false;
+let allAppsData = {};
+
+async function loadAppsFromFirestore() {
+  document.getElementById('loadingApps').classList.remove('hidden');
+  try {
+    const q = query(collection(db, "apps"), orderBy("name"));
+    const querySnapshot = await getDocs(q);
+    allAppsData = {};
+    querySnapshot.forEach((doc) => {
+      allAppsData[doc.id] = { id: doc.id,...doc.data() };
+    });
+    document.getElementById('loadingApps').classList.add('hidden');
+    loadApps(currentSection);
+    updateTotalAppsCount();
+  } catch (error) {
+    console.error('Error:', error);
+    document.getElementById('loadingApps').classList.add('hidden');
+    showToast('خطأ في تحميل التطبيقات');
+  }
+}
+
+async function handleAddApp(e) {
+  e.preventDefault();
+  const appData = {
+    name: document.getElementById('appName').value,
+    developer: document.getElementById('appDeveloper').value,
+    category: document.getElementById('appCategory').value,
+    size: document.getElementById('appSize').value,
+    icon: document.getElementById('appIcon').value,
+    downloadUrl: document.getElementById('appDownloadUrl').value,
+    description: document.getElementById('appDescription').value,
+    screenshots: document.getElementById('appScreenshots').value.split('\n').filter(url => url.trim()),
+    features: document.getElementById('appFeatures').value.split('\n').filter(f => f.trim()),
+    downloads: 0,
+    views: 0,
+    rating: 5.0
   };
+  try {
+    await addDoc(collection(db, "apps"), appData);
+    showToast('تم إضافة التطبيق بنجاح');
+    e.target.reset();
+    loadAppsFromFirestore();
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('خطأ في إضافة التطبيق');
+  }
+}
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+async function trackView(appId) {
+  try {
+    await updateDoc(doc(db, "apps", appId), { views: increment(1) });
+  } catch (error) { console.error('Error:', error); }
+}
 
-  // Admin Config
-  const ADMIN_PASSWORD = 'mohamed123';
-  
-  let currentSection = 'home';
-  let filteredApps = [];
-  let logoClickCount = 0;
-  let logoClickTimer = null;
-  let isAdminLoggedIn = false;
-  let allAppsData = {};
-  let userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+async function trackDownload(appId) {
+  try {
+    await updateDoc(doc(db, "apps", appId), { downloads: increment(1) });
+  } catch (error) { console.error('Error:', error); }
+}
 
-  // Firebase Analytics System
-  const FirebaseAnalytics = {
-    presenceRef: null,
-    connectedRef: null,
+function updateTotalAppsCount() {
+  document.getElementById('totalApps').textContent = Object.keys(allAppsData).length;
+}
 
-    init() {
-      this.setupPresence();
-      this.loadApps();
-      this.setupListeners();
-    },
-
-    setupPresence() {
-      const userRef = ref(db, `presence/${userId}`);
-      const connectedRef = ref(db, '.info/connected');
-      
-      onValue(connectedRef, (snap) => {
-        if (snap.val() === true) {
-          // User is online
-          set(userRef, {
-            online: true,
-            lastSeen: serverTimestamp()
-          });
-          
-          // Remove user when they disconnect
-          onDisconnect(userRef).remove();
-        }
-      });
-      
-      this.presenceRef = userRef;
-    },
-
-    loadApps() {
-      document.getElementById('loadingApps').classList.remove('hidden');
-      const appsRef = ref(db, 'apps');
-      
-      onValue(appsRef, (snapshot) => {
-        const data = snapshot.val();
-        allAppsData = data || {};
-        document.getElementById('loadingApps').classList.add('hidden');
-        loadApps(currentSection);
-        updateTotalAppsCount();
-      }, (error) => {
-        console.error('Error loading apps:', error);
-        document.getElementById('loadingApps').classList.add('hidden');
-        showToast('خطأ في تحميل التطبيقات');
-      });
-    },
-
-    setupListeners() {
-      // Online users count
-      const presenceRef = ref(db, 'presence');
-      onValue(presenceRef, (snapshot) => {
-        const count = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
-        document.getElementById('onlineBadgeCount').textContent = count;
-        document.getElementById('onlineUsersCount').textContent = count;
-      });
-
-      // Stats
-      const statsRef = ref(db, 'stats');
-      onValue(statsRef, (snapshot) => {
-        const stats = snapshot.val() || {};
-        document.getElementById('totalDownloads').textContent = stats.totalDownloads || 0;
-        document.getElementById('totalViews').textContent = stats.totalViews || 0;
-        
-        // Update admin dashboard if open
-        if (isAdminLoggedIn) {
-          updateAdminStats();
-        }
-      });
-    },
-
-    async trackView(appId, appName) {
-      // Increment app views
-      const appRef = ref(db, `apps/${appId}/views`);
-      runTransaction(appRef, (current) => (current || 0) + 1);
-      
-      // Increment total views
-      const viewsRef = ref(db, 'stats/totalViews');
-      runTransaction(viewsRef, (current) => (current || 0) + 1);
-      
-      // Log activity
-      this.logActivity('view', appName);
-    },
-
-    async trackDownload(appId, appName) {
-      // Increment app downloads
-      const appRef = ref(db, `apps/${appId}/downloads`);
-      runTransaction(appRef, (current) => (current || 0) + 1);
-      
-      // Increment total downloads
-      const downloadsRef = ref(db, 'stats/totalDownloads');
-      runTransaction(downloadsRef, (current) => (current || 0) + 1);
-      
-      // Log activity
-      this.logActivity('download', appName);
-    },
-
-    async logActivity(type, appName) {
-      const activityRef = ref(db, 'activity');
-      const newActivityRef = push(activityRef);
-      await set(newActivityRef, {
-        type: type,
-        app: appName,
-        timestamp: serverTimestamp()
-      });
-    },
-
-    async addApp(appData) {
-      const appsRef = ref(db, 'apps');
-      const newAppRef = push(appsRef);
-      await set(newAppRef, {
-        ...appData,
-        id: newAppRef.key,
-        views: 0,
-        downloads: 0,
-        rating: 5.0,
-        createdAt: serverTimestamp()
-      });
-      return newAppRef.key;
-    }
-  };
-
-  // Initialize
-  document.addEventListener('DOMContentLoaded', () => {
-    lucide.createIcons();
-    FirebaseAnalytics.init();
-    
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  loadAppsFromFirestore();
+  setTimeout(() => {
+    const intro = document.getElementById('introScreen');
+    intro.classList.add('intro-fade-out');
     setTimeout(() => {
-      const intro = document.getElementById('introScreen');
-      intro.classList.add('intro-fade-out');
-      setTimeout(() => {
-        intro.style.display = 'none';
-        document.getElementById('mainApp').classList.remove('hidden');
-        checkAdminAccess();
-      }, 1000);
-    }, 10000);
-    
-    setupEventListeners();
-    
-    // Check for dark mode
-    if (localStorage.getItem('darkMode') === 'true') {
-      document.documentElement.classList.add('dark');
+      intro.style.display = 'none';
+      document.getElementById('mainApp').classList.remove('hidden');
+      checkAdminAccess();
+    }, 1000);
+  }, 3000);
+  setupEventListeners();
+});
+
+function setupEventListeners() {
+  document.getElementById('menuBtn').addEventListener('click', openDrawer);
+  document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+  document.getElementById('drawerOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'drawerOverlay') closeDrawer();
+  });
+  document.querySelectorAll('[data-nav]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      switchSection(e.currentTarget.dataset.nav);
+    });
+  });
+  document.querySelectorAll('.drawer-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const page = e.currentTarget.dataset.page;
+      const modal = e.currentTarget.dataset.modal;
+      if (page) { switchSection(page); closeDrawer(); }
+      else if (modal) { showGenericModal(modal); closeDrawer(); }
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input', handleSearch);
+  document.getElementById('appModal').addEventListener('click', (e) => {
+    if (e.target.id === 'appModal') closeAppModal();
+  });
+  document.getElementById('genericModal').addEventListener('click', (e) => {
+    if (e.target.id === 'genericModal') closeGenericModal();
+  });
+  document.getElementById('logoBtn').addEventListener('click', handleLogoClick);
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+      e.preventDefault();
+      showAdminLogin();
     }
   });
-
-  function updateTotalAppsCount() {
-    const count = Object.keys(allAppsData).length;
-    document.getElementById('totalApps').textContent = count;
-  }
-
-  function setupEventListeners() {
-    document.getElementById('menuBtn').addEventListener('click', openDrawer);
-    document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
-    document.getElementById('drawerOverlay').addEventListener('click', (e) => {
-      if (e.target.id === 'drawerOverlay') closeDrawer();
-    });
-
-    document.querySelectorAll('[data-nav]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const section = e.currentTarget.dataset.nav;
-        switchSection(section);
-      });
-    });
-
-    document.querySelectorAll('.drawer-link').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const page = e.currentTarget.dataset.page;
-        const modal = e.currentTarget.dataset.modal;
-        if (page) {
-          switchSection(page);
-          closeDrawer();
-        } else if (modal) {
-          showGenericModal(modal);
-          closeDrawer();
-        }
-      });
-    });
-
-    document.getElementById('searchInput').addEventListener('input', handleSearch);
-
-    document.getElementById('appModal').addEventListener('click', (e) => {
-      if (e.target.id === 'appModal') closeAppModal();
-    });
-    
-    document.getElementById('genericModal').addEventListener('click', (e) => {
-      if (e.target.id === 'genericModal') closeGenericModal();
-    });
-
-    document.getElementById('logoBtn').addEventListener('click', handleLogoClick);
-    
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-        e.preventDefault();
-        showAdminLogin();
-      }
-    });
-
-    document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
-    document.getElementById('addAppForm').addEventListener('submit', handleAddApp);
-  }
-
-  function handleLogoClick() {
-    logoClickCount++;
-    clearTimeout(logoClickTimer);
-    
-    if (logoClickCount >= 5) {
-      logoClickCount = 0;
-      showAdminLogin();
-    } else {
-      logoClickTimer = setTimeout(() => {
-        logoClickCount = 0;
-      }, 2000);
-    }
-  }
-
-  function checkAdminAccess() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('admin')) {
-      showAdminLogin();
-    }
-  }
-
-  function showAdminLogin() {
-    const modal = document.getElementById('adminLoginModal');
-    const content = document.getElementById('adminLoginContent');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    setTimeout(() => {
-      content.classList.remove('scale-95', 'opacity-0');
-      content.classList.add('scale-100', 'opacity-100');
-    }, 10);
-    document.getElementById('adminPassword').focus();
-    lucide.createIcons();
-  }
-
-  function closeAdminLogin() {
-    const modal = document.getElementById('adminLoginModal');
-    const content = document.getElementById('adminLoginContent');
-    content.classList.remove('scale-100', 'opacity-100');
-    content.classList.add('scale-95', 'opacity-0');
-    setTimeout(() => {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      document.getElementById('adminPassword').value = '';
-      document.getElementById('loginError').classList.add('hidden');
-    }, 300);
-  }
-
-  function handleAdminLogin(e) {
-    e.preventDefault();
-    const password = document.getElementById('adminPassword').value;
-    const errorDiv = document.getElementById('loginError');
-    
-    if (password === ADMIN_PASSWORD) {
-      isAdminLoggedIn = true;
-      closeAdminLogin();
-      showAdminDashboard();
-      showToast('تم تسجيل الدخول بنجاح');
-    } else {
-      errorDiv.textContent = 'كلمة المرور غير صحيحة';
-      errorDiv.classList.remove('hidden');
-      document.getElementById('adminPassword').value = '';
-    }
-  }
-
-  function showAdminDashboard() {
-    const dashboard = document.getElementById('adminDashboard');
-    dashboard.classList.remove('hidden');
-    updateAdminStats();
-    lucide.createIcons();
-  }
-
-  window.closeAdminDashboard = function() {
-    document.getElementById('adminDashboard').classList.add('hidden');
-  }
-
-  window.adminLogout = function() {
-    isAdminLoggedIn = false;
-    closeAdminDashboard();
-    showToast('تم تسجيل الخروج');
-  }
-
-  async function handleAddApp(e) {
-    e.preventDefault();
-    
-    const appData = {
-      name: document.getElementById('appName').value,
-      developer: document.getElementById('appDeveloper').value,
-      category: document.getElementById('appCategory').value,
-      size: document.getElementById('appSize').value,
-      icon: document.getElementById('appIcon').value,
-      downloadUrl: document.getElementById('appDownloadUrl').value,
-      description: document.getElementById('appDescription').value,
-      screenshots: document.getElementById('appScreenshots').value.split('\n').filter(url => url.trim()),
-      features: document.getElementById('appFeatures').value.split('\n').filter(f => f.trim()),
-      downloadsText: '0+'
-    };
-    
-    try {
-      await FirebaseAnalytics.addApp(appData);
-      showToast('تم إضافة التطبيق بنجاح');
-      e.target.reset();
-    } catch (error) {
-      console.error('Error adding app:', error);
-      showToast('خطأ في إضافة التطبيق');
-    }
-  }
-
-  function updateAdminStats() {
-    const apps = Object.values(allAppsData);
-    
-    // Downloads list
-    const downloadsList = document.getElementById('downloadsList');
-    const sortedDownloads = apps
-      .filter(app => app.downloads > 0)
-      .sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
-    
-    if (sortedDownloads.length === 0) {
-      downloadsList.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">لا توجد تحميلات بعد</p>';
-    } else {
-      downloadsList.innerHTML = sortedDownloads.map(app => `
-        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl stat-card">
-          <div class="flex items-center gap-3">
-            <img src="${app.icon}" alt="${app.name}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://via.placeholder.com/40'">
-            <div>
-              <p class="font-semibold text-gray-900 text-sm">${app.name}</p>
-              <p class="text-xs text-gray-500">${app.developer}</p>
-            </div>
-          </div>
-          <span class="px-3 py-1 bg-[#01875f] text-white text-sm font-bold rounded-full">${app.downloads || 0}</span>
-        </div>
-      `).join('');
-    }
-    
-    // Views list
-    const viewsList = document.getElementById('viewsList');
-    const sortedViews = apps
-      .filter(app => app.views > 0)
-      .sort((a, b) => (b.views || 0) - (a.views || 0));
-    
-    if (sortedViews.length === 0) {
-      viewsList.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">لا توجد مشاهدات بعد</p>';
-    } else {
-      viewsList.innerHTML = sortedViews.slice(0, 10).map(app => `
-        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl stat-card">
-          <div class="flex items-center gap-3">
-            <img src="${app.icon}" alt="${app.name}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://via.placeholder.com/40'">
-            <div>
-              <p class="font-semibold text-gray-900 text-sm">${app.name}</p>
-              <p class="text-xs text-gray-500">${app.developer}</p>
-            </div>
-          </div>
-          <span class="px-3 py-1 bg-blue-500 text-white text-sm font-bold rounded-full">${app.views || 0}</span>
-        </div>
-      `).join('');
-    }
-    
-    // Recent activity
-    const activityRef = ref(db, 'activity');
-    onValue(activityRef, (snapshot) => {
-      const activityDiv = document.getElementById('recentActivity');
-      const data = snapshot.val();
-      
-      if (!data) {
-        activityDiv.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">لا يوجد نشاط بعد</p>';
-        return;
-      }
-      
-      const activities = Object.values(data)
-        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-        .slice(0, 20);
-      
-      activityDiv.innerHTML = activities.map(item => {
-        const timeAgo = getTimeAgo(item.timestamp);
-        const icon = item.type === 'download' ? 'download' : 'eye';
-        const color = item.type === 'download' ? 'text-green-600' : 'text-blue-600';
-        const bgColor = item.type === 'download' ? 'bg-green-50' : 'bg-blue-50';
-        
-        return `
-          <div class="flex items-center gap-3 p-3 ${bgColor} rounded-xl">
-            <div class="w-8 h-8 ${bgColor} rounded-lg flex items-center justify-center flex-shrink-0">
-              <i data-lucide="${icon}" class="w-4 h-4 ${color}"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-semibold text-gray-900 text-sm">${item.app}</p>
-              <p class="text-xs text-gray-500">${item.type === 'download' ? 'تم التحميل' : 'تمت المشاهدة'} • ${timeAgo}</p>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      lucide.createIcons();
-    });
-    
-    lucide.createIcons();
-  }
-
-  function getTimeAgo(timestamp) {
-    if (!timestamp) return 'الآن';
-    const seconds = Math.floor((Date.now() - timestamp) / 1000);
-    if (seconds < 60) return 'الآن';
-    if (seconds < 3600) return `منذ ${Math.floor(seconds / 60)} دقيقة`;
-    if (seconds < 86400) return `منذ ${Math.floor(seconds / 3600)} ساعة`;
-    return `منذ ${Math.floor(seconds / 86400)} يوم`;
-  }
-
-  function openDrawer() {
-    const overlay = document.getElementById('drawerOverlay');
-    const drawer = document.getElementById('drawer');
-    overlay.classList.remove('hidden');
-    setTimeout(() => {
-      overlay.classList.remove('opacity-0');
-      drawer.classList.remove('translate-x-full');
-    }, 10);
-  }
-
-  function closeDrawer() {
-    const overlay = document.getElementById('drawerOverlay');
-    const drawer = document.getElementById('drawer');
-    overlay.classList.add('opacity-0');
-    drawer.classList.add('translate-x-full');
-    setTimeout(() => overlay.classList.add('hidden'), 300);
-  }
-
-  function switchSection(section) {
-    currentSection = section;
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.classList.remove('active', 'text-[#01875f]');
-      btn.classList.add('text-gray-600');
-      if (btn.dataset.nav === section) {
-        btn.classList.add('active', 'text-[#01875f]');
-        btn.classList.remove('text-gray-600');
-      }
-    });
-    
-    const titles = {
-      home: { title: 'التطبيقات المميزة', desc: 'اكتشف أفضل التطبيقات المصنوعة بـ MIT App Inventor' },
-      games: { title: 'الألعاب', desc: 'مجموعة من الألعاب الممتعة والتفاعلية' },
-      apps: { title: 'التطبيقات', desc: 'تطبيقات عملية لإنجاز مهامك اليومية' },
-      kids: { title: 'تطبيقات الأطفال', desc: 'محتوى آمن وتعليمي لأطفالك' }
-    };
-    
-    document.getElementById('sectionTitle').textContent = titles[section].title;
-    document.getElementById('sectionDesc').textContent = titles[section].desc;
-    document.getElementById('searchInput').value = '';
-    
-    loadApps(section);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function loadApps(section, searchTerm = '') {
-    const apps = Object.values(allAppsData);
-    let appsToShow = [];
-    
-    if (section === 'home') {
-      appsToShow = apps;
-    } else {
-      appsToShow = apps.filter(app => app.category === section);
-    }
-    
-    filteredApps = searchTerm 
-      ? appsToShow.filter(app => 
-          app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.developer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.category.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      : appsToShow;
-    
-    renderApps(filteredApps);
-  }
-
-  function renderApps(apps) {
-    const grid = document.getElementById('appsGrid');
-    const noResults = document.getElementById('noResults');
-    
-    if (apps.length === 0) {
-      grid.innerHTML = '';
-      noResults.classList.remove('hidden');
-      return;
-    }
-    
-    noResults.classList.add('hidden');
-    grid.innerHTML = apps.map(app => `
-      <div class="app-card bg-white rounded-2xl p-4 cursor-pointer border border-gray-200" onclick="showAppDetail('${app.id}')">
-        <div class="flex gap-3 mb-3">
-          <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover flex-shrink-0" onerror="this.src='https://via.placeholder.com/64'">
-          <div class="flex-1 min-w-0">
-            <h3 class="font-bold text-gray-900 text-base mb-1 truncate">${app.name}</h3>
-            <p class="text-sm text-gray-600 mb-1">${app.developer}</p>
-            <div class="flex items-center gap-2 text-xs text-gray-500">
-              <span class="flex items-center gap-1">
-                <span>${app.rating}</span>
-                <i data-lucide="star" class="w-3 h-3 fill-yellow-400 text-yellow-400"></i>
-              </span>
-              <span>•</span>
-              <span>${app.size}</span>
-            </div>
-          </div>
-        </div>
-        <p class="text-xs text-gray-600 mb-3 line-clamp-2">${app.description}</p>
-        <div class="flex gap-2">
-          <span class="px-3 py-1 bg-green-50 text-[#01875f] text-xs font-semibold rounded-full">${getCategoryName(app.category)}</span>
-          <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">${app.downloads || 0} تحميل</span>
-        </div>
-      </div>
-    `).join('');
-    
-    lucide.createIcons();
-  }
-
-  function getCategoryName(cat) {
-    const names = { home: 'مميز', games: 'ألعاب', apps: 'تطبيقات', kids: 'أطفال' };
-    return names[cat] || cat;
-  }
-
-  function handleSearch(e) {
-    const searchTerm = e.target.value.trim();
-    loadApps(currentSection, searchTerm);
-  }
-
-  window.showAppDetail = function(appId) {
-    const app = allAppsData[appId];
-    if (!app) return;
-    
-    FirebaseAnalytics.trackView(appId, app.name);
-    
-    const modal = document.getElementById('appModal');
-    const content = document.getElementById('modalContent');
-    
-    content.innerHTML = `
-      <div class="overflow-y-auto">
-        <div class="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-4 flex items-center justify-between z-10">
-          <button onclick="closeAppModal()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <i data-lucide="x" class="w-6 h-6"></i>
-          </button>
-          <div class="flex gap-2">
-            <button onclick="shareApp('${appId}')" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <i data-lucide="share-2" class="w-5 h-5 text-gray-700"></i>
-            </button>
-            <button class="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <i data-lucide="bookmark" class="w-5 h-5 text-gray-700"></i>
-            </button>
-          </div>
-        </div>
-        
-        <div class="p-4 md:p-6">
-          <div class="flex gap-4 mb-6">
-            <img src="${app.icon}" alt="${app.name}" class="w-20 h-20 md:w-24 md:h-24 rounded-3xl object-cover flex-shrink-0 shadow-lg" onerror="this.src='https://via.placeholder.com/96'">
-            <div class="flex-1 min-w-0">
-              <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-1">${app.name}</h2>
-              <p class="text-sm md:text-base text-[#01875f] font-semibold mb-2">${app.developer}</p>
-              <div class="flex items-center gap-3 text-sm text-gray-600">
-                <span class="flex items-center gap-1">
-                  <span class="font-bold text-gray-900">${app.rating}</span>
-                  <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
-                </span>
-                <span>${app.downloads || 0} تنزيل</span>
-              </div>
-            </div>
-          </div>
-          
-          <button onclick="downloadApp('${appId}', '${app.name}', '${app.downloadUrl}')" class="w-full bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-3.5 rounded-full transition-colors mb-6 text-lg">
-            تحميل الآن
-          </button>
-          
-          ${app.screenshots && app.screenshots.length > 0 ? `
-          <div class="mb-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-3">لقطات الشاشة</h3>
-            <div class="flex gap-3 overflow-x-auto screenshot-scroll pb-2">
-              ${app.screenshots.map(shot => `
-                <img src="${shot}" alt="Screenshot" class="h-80 md:h-96 rounded-2xl border border-gray-200 flex-shrink-0" onerror="this.style.display='none'">
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-          
-          <div class="mb-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-3">حول هذا التطبيق</h3>
-            <p class="text-gray-700 leading-relaxed mb-4">${app.description}</p>
-            ${app.features && app.features.length > 0 ? `
-            <div class="space-y-2">
-              ${app.features.map(feature => `
-                <div class="flex items-center gap-2 text-gray-700">
-                  <i data-lucide="check-circle" class="w-5 h-5 text-[#01875f] flex-shrink-0"></i>
-                  <span>${feature}</span>
-                </div>
-              `).join('')}
-            </div>
-            ` : ''}
-          </div>
-          
-          <div class="border-t border-gray-200 pt-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">معلومات التطبيق</h3>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p class="text-gray-500 mb-1">الحجم</p>
-                <p class="font-semibold text-gray-900">${app.size}</p>
-              </div>
-              <div>
-                <p class="text-gray-500 mb-1">التصنيف</p>
-                <p class="font-semibold text-gray-900">${getCategoryName(app.category)}</p>
-              </div>
-              <div>
-                <p class="text-gray-500 mb-1">التنزيلات</p>
-                <p class="font-semibold text-gray-900">${app.downloads || 0}</p>
-              </div>
-              <div>
-                <p class="text-gray-500 mb-1">المشاهدات</p>
-                <p class="font-semibold text-gray-900">${app.views || 0}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    setTimeout(() => {
-      content.classList.remove('scale-95', 'opacity-0');
-      content.classList.add('scale-100', 'opacity-100');
-    }, 10);
-    
-    lucide.createIcons();
-    document.body.style.overflow = 'hidden';
-  }
-
-  window.downloadApp = function(appId, appName, downloadUrl) {
-    FirebaseAnalytics.trackDownload(appId, appName);
-    showToast(`جاري تحميل ${appName}...`);
-    window.open(downloadUrl, '_blank');
-    closeAppModal();
-  }
-
-  window.shareApp = function(appId) {
-    const url = `${window.location.origin}${window.location.pathname}?app=${appId}`;
-    navigator.clipboard.writeText(url).then(() => {
-      showToast('تم نسخ رابط التطبيق');
-    });
-  }
-
-  window.closeAppModal = function() {
-    const modal = document.getElementById('appModal');
-    const content = document.getElementById('modalContent');
-    content.classList.remove('scale-100', 'opacity-100');
-    content.classList.add('scale-95', 'opacity-0');
-    setTimeout(() => {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      document.body.style.overflow = '';
-    }, 300);
-  }
-
-  function showGenericModal(type) {
-    const modal = document.getElementById('genericModal');
-    const content = document.getElementById('genericModalContent');
-    
-    const modals = {
-      about: {
-        title: 'حول المتجر',
-        content: `
-          <p class="text-gray-700 leading-relaxed mb-4">مرحباً بك في MOHAMED PLAY STORE، المتجر المتخصص في التطبيقات المصنوعة بـواسطه MOHAMED GHARIB.</p>
-          <p class="text-gray-700 leading-relaxed mb-4">نحن نوفر منصة للمطورين المبتدئين والمحترفين لعرض تطبيقاتهم المصنوعة بسهولة باستخدام MOHAMED GHARIB.</p>
-          <div class="bg-green-50 rounded-xl p-4 mt-6">
-            <p class="text-sm text-[#01875f] font-semibold">✨ هدفنا:انشاء تطبيقات مجانيه ومفيده للجميع</p>
-          </div>
-          <div class="bg-blue-50 rounded-xl p-4 mt-3">
-            <p class="text-xs text-blue-700">🔥 مميزات جديدة: نظام Firebase للحضور المباشر والإحصائيات الفورية</p>
-          </div>
-        `
-      },
-      settings: {
-        title: 'الإعدادات',
-        content: `
-          <div class="space-y-4">
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-              <div class="flex items-center gap-3">
-                <i data-lucide="bell" class="w-5 h-5 text-gray-700"></i>
-                <span class="font-semibold">الإشعارات</span>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="notifToggle" checked class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-300 peer-checked:bg-[#01875f] rounded-full peer transition-colors"></div>
-              </label>
-            </div>
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-              <div class="flex items-center gap-3">
-                <i data-lucide="moon" class="w-5 h-5 text-gray-700"></i>
-                <span class="font-semibold">الوضع الليلي</span>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="darkModeToggle" class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-300 peer-checked:bg-[#01875f] rounded-full peer transition-colors"></div>
-              </label>
-            </div>
-          </div>
-        `
-      },
-      contact: {
-  title: 'تواصل معنا',
-  content: `
-    <div class="text-center space-y-6 py-8">
-      <div class="text-6xl mb-4">📧</div>
-      <h3 class="text-2xl font-bold text-gray-800">نحب نسمع منك</h3>
-      <p class="text-gray-600 max-w-md mx-auto">
-        عندك سؤال أو اقتراح؟ ابعتلنا رسالتك وهيوصلك رد في أقرب وقت
-      </p>
-      <a 
-        href="https://forms.gle/JwVejZHpeZJxx9Er5" 
-        target="_blank"
-        class="inline-block bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-4 px-8 rounded-xl transition-colors text-lg"
-      >
-        افتح فورم التواصل
-      </a>
-      <p class="text-sm text-gray-500">هيفتح في صفحة جديدة</p>
-    </div>
-  `
+  document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+  document.getElementById('addAppForm').addEventListener('submit', handleAddApp);
 }
-    
-    const modalData = modals[type];
-    content.innerHTML = `
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-2xl font-bold text-gray-900">${modalData.title}</h3>
-          <button onclick="closeGenericModal()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
+
+function handleLogoClick() {
+  logoClickCount++;
+  clearTimeout(logoClickTimer);
+  if (logoClickCount >= 5) {
+    logoClickCount = 0;
+    showAdminLogin();
+  } else {
+    logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
+  }
+}
+
+function checkAdminAccess() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('admin')) showAdminLogin();
+}
+
+function showAdminLogin() {
+  const modal = document.getElementById('adminLoginModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.getElementById('adminPassword').focus();
+  lucide.createIcons();
+}
+
+function closeAdminLogin() {
+  const modal = document.getElementById('adminLoginModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('loginError').classList.add('hidden');
+}
+
+function handleAdminLogin(e) {
+  e.preventDefault();
+  const password = document.getElementById('adminPassword').value;
+  const errorDiv = document.getElementById('loginError');
+  if (password === ADMIN_PASSWORD) {
+    isAdminLoggedIn = true;
+    closeAdminLogin();
+    showAdminDashboard();
+    showToast('تم تسجيل الدخول بنجاح');
+  } else {
+    errorDiv.textContent = 'كلمة المرور غير صحيحة';
+    errorDiv.classList.remove('hidden');
+    document.getElementById('adminPassword').value = '';
+  }
+}
+
+function showAdminDashboard() {
+  document.getElementById('adminDashboard').classList.remove('hidden');
+  updateAdminStats();
+  lucide.createIcons();
+}
+
+window.closeAdminDashboard = function() {
+  document.getElementById('adminDashboard').classList.add('hidden');
+}
+
+window.adminLogout = function() {
+  isAdminLoggedIn = false;
+  closeAdminDashboard();
+  showToast('تم تسجيل الخروج');
+}
+
+function updateAdminStats() {
+  const apps = Object.values(allAppsData);
+  document.getElementById('totalDownloads').textContent = apps.reduce((sum, app) => sum + (app.downloads || 0), 0);
+  document.getElementById('totalViews').textContent = apps.reduce((sum, app) => sum + (app.views || 0), 0);
+  lucide.createIcons();
+}
+
+function openDrawer() {
+  const overlay = document.getElementById('drawerOverlay');
+  const drawer = document.getElementById('drawer');
+  overlay.classList.remove('hidden');
+  setTimeout(() => {
+    overlay.classList.remove('opacity-0');
+    drawer.classList.remove('translate-x-full');
+  }, 10);
+}
+
+function closeDrawer() {
+  const overlay = document.getElementById('drawerOverlay');
+  const drawer = document.getElementById('drawer');
+  overlay.classList.add('opacity-0');
+  drawer.classList.add('translate-x-full');
+  setTimeout(() => overlay.classList.add('hidden'), 300);
+}
+
+function switchSection(section) {
+  currentSection = section;
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active', 'text-[#01875f]');
+    btn.classList.add('text-gray-600');
+    if (btn.dataset.nav === section) {
+      btn.classList.add('active', 'text-[#01875f]');
+      btn.classList.remove('text-gray-600');
+    }
+  });
+  const titles = {
+    home: { title: 'التطبيقات المميزة', desc: 'اكتشف أفضل التطبيقات' },
+    games: { title: 'الألعاب', desc: 'مجموعة من الألعاب الممتعة' },
+    apps: { title: 'التطبيقات', desc: 'تطبيقات عملية' },
+    kids: { title: 'تطبيقات الأطفال', desc: 'محتوى آمن وتعليمي' }
+  };
+  document.getElementById('sectionTitle').textContent = titles[section].title;
+  document.getElementById('sectionDesc').textContent = titles[section].desc;
+  document.getElementById('searchInput').value = '';
+  loadApps(section);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function loadApps(section, searchTerm = '') {
+  const apps = Object.values(allAppsData);
+  let appsToShow = section === 'home'? apps : apps.filter(app => app.category === section);
+  filteredApps = searchTerm? appsToShow.filter(app =>
+    app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.developer.toLowerCase().includes(searchTerm.toLowerCase())
+  ) : appsToShow;
+  renderApps(filteredApps);
+}
+
+function renderApps(apps) {
+  const grid = document.getElementById('appsGrid');
+  const noResults = document.getElementById('noResults');
+  if (apps.length === 0) {
+    grid.innerHTML = '';
+    noResults.classList.remove('hidden');
+    return;
+  }
+  noResults.classList.add('hidden');
+  grid.innerHTML = apps.map(app => `
+    <div class="app-card bg-white rounded-2xl p-4 cursor-pointer border border-gray-200" onclick="showAppDetail('${app.id}')">
+      <div class="flex gap-3 mb-3">
+        <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover flex-shrink-0" onerror="this.src='https://via.placeholder.com/64'">
+        <div class="flex-1 min-w-0">
+          <h3 class="font-bold text-gray-900 text-base mb-1 truncate">${app.name}</h3>
+          <p class="text-sm text-gray-600 mb-1">${app.developer}</p>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span class="flex items-center gap-1">
+              <span>${app.rating}</span>
+              <i data-lucide="star" class="w-3 h-3 fill-yellow-400 text-yellow-400"></i>
+            </span>
+            <span>•</span>
+            <span>${app.size}</span>
+          </div>
         </div>
-        <div>${modalData.content}</div>
+      <p class="text-xs text-gray-600 mb-3 line-clamp-2">${app.description}</p>
+      <div class="flex gap-2">
+        <span class="px-3 py-1 bg-green-50 text-[#01875f] text-xs font-semibold rounded-full">${getCategoryName(app.category)}</span>
+        <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">${app.downloads || 0} تحميل</span>
       </div>
-    `;
-    
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    setTimeout(() => {
-      content.classList.remove('scale-95', 'opacity-0');
-      content.classList.add('scale-100', 'opacity-100');
-    }, 10);
-    
-    if (type === 'settings') {
-      setTimeout(() => {
-        const darkToggle = document.getElementById('darkModeToggle');
-        darkToggle.checked = localStorage.getItem('darkMode') === 'true';
-        darkToggle.addEventListener('change', toggleDarkMode);
-        
-        const notifToggle = document.getElementById('notifToggle');
-        notifToggle.checked = localStorage.getItem('notifications') !== 'false';
-        notifToggle.addEventListener('change', (e) => {
-          localStorage.setItem('notifications', e.target.checked);
-          showToast(e.target.checked ? 'تم تفعيل الإشعارات' : 'تم إيقاف الإشعارات');
-        });
-      }, 100);
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+function getCategoryName(cat) {
+  const names = { home: 'مميز', games: 'ألعاب', apps: 'تطبيقات', kids: 'أطفال' };
+  return names[cat] || cat;
+}
+
+function handleSearch(e) {
+  loadApps(currentSection, e.target.value.trim());
+}
+
+window.showAppDetail = function(appId) {
+  const app = allAppsData[appId];
+  if (!app) return;
+  trackView(appId);
+  const modal = document.getElementById('appModal');
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-4 flex items-center justify-between z-10">
+        <button onclick="closeAppModal()" class="p-2 hover:bg-gray-100 rounded-full">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <button onclick="shareApp('${appId}')" class="p-2 hover:bg-gray-100 rounded-full">
+          <i data-lucide="share-2" class="w-5 h-5 text-gray-700"></i>
+        </button>
+      </div>
+      <div class="p-4 md:p-6">
+        <div class="flex gap-4 mb-6">
+          <img src="${app.icon}" alt="${app.name}" class="w-20 h-20 md:w-24 md:h-24 rounded-3xl object-cover flex-shrink-0 shadow-lg" onerror="this.src='https://via.placeholder.com/96'">
+          <div class="flex-1 min-w-0">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-1">${app.name}</h2>
+            <p class="text-sm md:text-base text-[#01875f] font-semibold mb-2">${app.developer}</p>
+            <div class="flex items-center gap-3 text-sm text-gray-600">
+              <span class="flex items-center gap-1">
+                <span class="font-bold text-gray-900">${app.rating}</span>
+                <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
+              </span>
+              <span>${app.downloads || 0} تنزيل</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="downloadApp('${appId}', '${app.name}', '${app.downloadUrl}')" class="w-full bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-3.5 rounded-full mb-6 text-lg">تحميل الآن</button>
+        ${app.screenshots && app.screenshots.length > 0? `
+        <div class="mb-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-3">لقطات الشاشة</h3>
+          <div class="flex gap-3 overflow-x-auto pb-2">
+            ${app.screenshots.map(shot => `<img src="${shot}" alt="Screenshot" class="h-80 md:h-96 rounded-2xl border border-gray-200 flex-shrink-0" onerror="this.style.display='none'">`).join('')}
+          </div>
+        </div>` : ''}
+        <div class="mb-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-3">حول هذا التطبيق</h3>
+          <p class="text-gray-700 leading-relaxed mb-4">${app.description}</p>
+          ${app.features && app.features.length > 0? `
+          <div class="space-y-2">
+            ${app.features.map(feature => `
+              <div class="flex items-center gap-2 text-gray-700">
+                <i data-lucide="check-circle" class="w-5 h-5 text-[#01875f] flex-shrink-0"></i>
+                <span>${feature}</span>
+              </div>
+            `).join('')}
+          </div>` : ''}
+        </div>
+        <div class="border-t border-gray-200 pt-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">معلومات التطبيق</h3>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-gray-500 mb-1">الحجم</p>
+              <p class="font-semibold text-gray-900">${app.size}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-1">التصنيف</p>
+              <p class="font-semibold text-gray-900">${getCategoryName(app.category)}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-1">التنزيلات</p>
+              <p class="font-semibold text-gray-900">${app.downloads || 0}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-1">المشاهدات</p>
+              <p class="font-semibold text-gray-900">${app.views || 0}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  lucide.createIcons();
+  document.body.style.overflow = 'hidden';
+}
+
+window.downloadApp = function(appId, appName, downloadUrl) {
+  trackDownload(appId);
+  showToast(`جاري تحميل ${appName}...`);
+  window.open(downloadUrl, '_blank');
+  closeAppModal();
+}
+
+window.shareApp = function(appId) {
+  const url = `${window.location.origin}${window.location.pathname}?app=${appId}`;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('تم نسخ رابط التطبيق');
+  });
+}
+
+window.closeAppModal = function() {
+  const modal = document.getElementById('appModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+
+function showGenericModal(type) {
+  const modal = document.getElementById('genericModal');
+  const content = document.getElementById('genericModalContent');
+  const modals = {
+    about: {
+      title: 'حول المتجر',
+      content: `
+        <p class="text-gray-700 leading-relaxed mb-4">مرحباً بك في MOHAMED PLAY STORE، المتجر المتخصص في التطبيقات.</p>
+        <div class="bg-green-50 rounded-xl p-4 mt-6">
+          <p class="text-sm text-[#01875f] font-semibold">✨ هدفنا: انشاء تطبيقات مجانيه ومفيده للجميع</p>
+        </div>
+      `
+    },
+    contact: {
+      title: 'تواصل معنا',
+      content: `
+        <div class="text-center space-y-6 py-8">
+          <div class="text-6xl mb-4">📧</div>
+          <h3 class="text-2xl font-bold text-gray-800">نحب نسمع منك</h3>
+          <p class="text-gray-600 max-w-md mx-auto">عندك سؤال أو اقتراح؟ ابعتلنا رسالتك</p>
+          <a href="https://forms.gle/JwVejZHpeZJxx9Er5" target="_blank" class="inline-block bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-4 px-8 rounded-xl text-lg">افتح فورم التواصل</a>
+          <p class="text-sm text-gray-500">هيفتح في صفحة جديدة</p>
+        </div>
+      `
     }
-    
-    lucide.createIcons();
-  }
+  };
+  const modalData = modals[type];
+  content.innerHTML = `
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-gray-900">${modalData.title}</h3>
+        <button onclick="closeGenericModal()" class="p-2 hover:bg-gray-100 rounded-full">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div>${modalData.content}</div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  lucide.createIcons();
+}
 
-  window.closeGenericModal = function() {
-    const modal = document.getElementById('genericModal');
-    const content = document.getElementById('genericModalContent');
-    content.classList.remove('scale-100', 'opacity-100');
-    content.classList.add('scale-95', 'opacity-0');
-    setTimeout(() => {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }, 300);
-  }
+window.closeGenericModal = function() {
+  const modal = document.getElementById('genericModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
 
-  function toggleDarkMode(e) {
-    if (e.target.checked) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('darkMode', 'true');
-      showToast('تم تفعيل الوضع الليلي');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('darkMode', 'false');
-      showToast('تم إيقاف الوضع الليلي');
-    }
-  }
-
-  window.submitContact = function(e) {
-    e.preventDefault();
-    showToast('تم إرسال رسالتك بنجاح');
-    closeGenericModal();
-  }
-
-  function showToast(message) {
-    if (localStorage.getItem('notifications') === 'false') return;
-    
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
-    toastMessage.textContent = message;
-    toast.classList.remove('translate-y-20', 'opacity-0');
-    
-    setTimeout(() => {
-      toast.classList.add('translate-y-20', 'opacity-0');
-    }, 3000);
-    
-    lucide.createIcons();
-  }
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  toastMessage.textContent = message;
+  toast.classList.remove('translate-y-20', 'opacity-0');
+  setTimeout(() => {
+    toast.classList.add('translate-y-20', 'opacity-0');
+  }, 3000);
+  lucide.createIcons();
+}
 </script>
-
-<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
-<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
 </body>
 </html>
