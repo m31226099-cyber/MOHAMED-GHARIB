@@ -53,7 +53,7 @@ body { overflow-x: hidden; }
 </div>
 
 <div id="adminLoginModal" class="fixed inset-0 modal-backdrop z-[60] hidden items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6" id="adminLoginContent">
+  <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6">
     <div class="text-center mb-6">
       <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
         <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
@@ -88,7 +88,6 @@ body { overflow-x: hidden; }
           </button>
           <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-white text-purple-600 rounded-xl font-semibold">إغلاق</button>
         </div>
-      </div>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
         <div class="bg-white/10 backdrop-blur rounded-xl p-4">
           <p class="text-sm text-purple-100 mb-1">إجمالي التحميلات</p>
@@ -108,9 +107,10 @@ body { overflow-x: hidden; }
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-6">
       <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
         <i data-lucide="plus-circle" class="w-5 h-5 text-[#01875f]"></i>
-        إضافة تطبيق جديد
+        <span id="formTitle">إضافة تطبيق جديد</span>
       </h3>
       <form id="addAppForm" class="space-y-4">
+        <input type="hidden" id="editAppId">
         <div class="grid md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">اسم التطبيق *</label>
@@ -155,11 +155,31 @@ body { overflow-x: hidden; }
           <label class="block text-sm font-semibold text-gray-700 mb-2">المميزات (مميزة واحدة في كل سطر)</label>
           <textarea id="appFeatures" rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#01875f] resize-none"></textarea>
         </div>
-        <button type="submit" class="w-full bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2">
-          <i data-lucide="plus" class="w-5 h-5"></i>
-          <span>إضافة التطبيق</span>
-        </button>
+        <div class="flex gap-3">
+          <button type="submit" class="flex-1 bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2">
+            <i data-lucide="save" class="w-5 h-5"></i>
+            <span id="submitBtnText">إضافة التطبيق</span>
+          </button>
+          <button type="button" onclick="cancelEdit()" id="cancelEditBtn" class="hidden px-6 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3.5 rounded-xl">إلغاء</button>
+        </div>
       </form>
+    </div>
+
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-6">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <i data-lucide="grid" class="w-5 h-5 text-[#01875f]"></i>
+          إدارة التطبيقات
+        </h3>
+        <select id="filterCategory" onchange="filterAppsByCategory()" class="px-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#01875f]">
+          <option value="all">كل التطبيقات</option>
+          <option value="home">الرئيسية</option>
+          <option value="games">الألعاب</option>
+          <option value="apps">التطبيقات</option>
+          <option value="kids">الأطفال</option>
+        </select>
+      </div>
+      <div id="appsListAdmin" class="space-y-3 max-h-[600px] overflow-y-auto"></div>
     </div>
   </div>
 </div>
@@ -272,7 +292,7 @@ body { overflow-x: hidden; }
 </div>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, orderBy, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, orderBy, increment, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDSxk0kXJGs__nmtF4V4V_Ro_kkBhzE6IA",
@@ -293,6 +313,7 @@ let logoClickCount = 0;
 let logoClickTimer = null;
 let isAdminLoggedIn = false;
 let allAppsData = {};
+let isEditMode = false;
 
 async function loadAppsFromFirestore() {
   document.getElementById('loadingApps').classList.remove('hidden');
@@ -306,6 +327,7 @@ async function loadAppsFromFirestore() {
     document.getElementById('loadingApps').classList.add('hidden');
     loadApps(currentSection);
     updateTotalAppsCount();
+    if (isAdminLoggedIn) updateAdminStats();
   } catch (error) {
     console.error('Error:', error);
     document.getElementById('loadingApps').classList.add('hidden');
@@ -315,6 +337,8 @@ async function loadAppsFromFirestore() {
 
 async function handleAddApp(e) {
   e.preventDefault();
+  const editAppId = document.getElementById('editAppId').value;
+
   const appData = {
     name: document.getElementById('appName').value,
     developer: document.getElementById('appDeveloper').value,
@@ -324,19 +348,26 @@ async function handleAddApp(e) {
     downloadUrl: document.getElementById('appDownloadUrl').value,
     description: document.getElementById('appDescription').value,
     screenshots: document.getElementById('appScreenshots').value.split('\n').filter(url => url.trim()),
-    features: document.getElementById('appFeatures').value.split('\n').filter(f => f.trim()),
-    downloads: 0,
-    views: 0,
-    rating: 5.0
+    features: document.getElementById('appFeatures').value.split('\n').filter(f => f.trim())
   };
+
   try {
-    await addDoc(collection(db, "apps"), appData);
-    showToast('تم إضافة التطبيق بنجاح');
+    if (editAppId) {
+      await updateDoc(doc(db, "apps", editAppId), appData);
+      showToast('تم تحديث التطبيق بنجاح');
+      cancelEdit();
+    } else {
+      appData.downloads = 0;
+      appData.views = 0;
+      appData.rating = 5.0;
+      await addDoc(collection(db, "apps"), appData);
+      showToast('تم إضافة التطبيق بنجاح');
+    }
     e.target.reset();
     loadAppsFromFirestore();
   } catch (error) {
     console.error('Error:', error);
-    showToast('خطأ في إضافة التطبيق');
+    showToast('خطأ في حفظ التطبيق');
   }
 }
 
@@ -477,7 +508,101 @@ function updateAdminStats() {
   const apps = Object.values(allAppsData);
   document.getElementById('totalDownloads').textContent = apps.reduce((sum, app) => sum + (app.downloads || 0), 0);
   document.getElementById('totalViews').textContent = apps.reduce((sum, app) => sum + (app.views || 0), 0);
+  renderAppsListAdmin('all');
   lucide.createIcons();
+}
+
+function renderAppsListAdmin(category) {
+  const apps = Object.values(allAppsData);
+  const filtered = category === 'all'? apps : apps.filter(app => app.category === category);
+  const appsListAdmin = document.getElementById('appsListAdmin');
+
+  if (filtered.length === 0) {
+    appsListAdmin.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">لا توجد تطبيقات في هذا القسم</p>';
+    return;
+  }
+
+  appsListAdmin.innerHTML = filtered.map(app => `
+    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
+        <img src="${app.icon}" alt="${app.name}" class="w-12 h-12 rounded-xl object-cover flex-shrink-0" onerror="this.src='https://via.placeholder.com/48'">
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-gray-900 text-sm truncate">${app.name}</p>
+          <div class="flex items-center gap-2 text-xs text-gray-500 mt-1 flex-wrap">
+            <span class="px-2 py-0.5 bg-green-100 text-[#01875f] rounded-full font-semibold">${getCategoryName(app.category)}</span>
+            <span>•</span>
+            <span>${app.downloads || 0} تحميل</span>
+            <span>•</span>
+            <span>${app.views || 0} مشاهدة</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="editApp('${app.id}')" class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1">
+          <i data-lucide="edit" class="w-4 h-4"></i>
+          <span>تعديل</span>
+        </button>
+        <button onclick="deleteApp('${app.id}', '${app.name}')" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>حذف</span>
+        </button>
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+window.filterAppsByCategory = function() {
+  const category = document.getElementById('filterCategory').value;
+  renderAppsListAdmin(category);
+}
+
+window.editApp = function(appId) {
+  const app = allAppsData[appId];
+  if (!app) return;
+
+  isEditMode = true;
+  document.getElementById('editAppId').value = appId;
+  document.getElementById('appName').value = app.name;
+  document.getElementById('appDeveloper').value = app.developer;
+  document.getElementById('appCategory').value = app.category;
+  document.getElementById('appSize').value = app.size;
+  document.getElementById('appIcon').value = app.icon;
+  document.getElementById('appDownloadUrl').value = app.downloadUrl;
+  document.getElementById('appDescription').value = app.description;
+  document.getElementById('appScreenshots').value = app.screenshots? app.screenshots.join('\n') : '';
+  document.getElementById('appFeatures').value = app.features? app.features.join('\n') : '';
+
+  document.getElementById('formTitle').textContent = 'تعديل التطبيق';
+  document.getElementById('submitBtnText').textContent = 'تحديث التطبيق';
+  document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+  document.getElementById('addAppForm').scrollIntoView({ behavior: 'smooth' });
+  showToast('عدل البيانات ودوس تحديث');
+  lucide.createIcons();
+}
+
+window.cancelEdit = function() {
+  isEditMode = false;
+  document.getElementById('addAppForm').reset();
+  document.getElementById('editAppId').value = '';
+  document.getElementById('formTitle').textContent = 'إضافة تطبيق جديد';
+  document.getElementById('submitBtnText').textContent = 'إضافة التطبيق';
+  document.getElementById('cancelEditBtn').classList.add('hidden');
+  showToast('تم إلغاء التعديل');
+}
+
+window.deleteApp = async function(appId, appName) {
+  if (confirm(`متأكد عايز تحذف ${appName}؟\nمش هتعرف ترجعه تاني!`)) {
+    try {
+      await deleteDoc(doc(db, "apps", appId));
+      showToast('تم حذف التطبيق بنجاح');
+      loadAppsFromFirestore();
+    } catch (error) {
+      console.error('Error:', error);
+      showToast('خطأ في حذف التطبيق');
+    }
+  }
 }
 
 function openDrawer() {
