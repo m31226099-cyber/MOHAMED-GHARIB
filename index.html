@@ -123,6 +123,10 @@ body { overflow-x: hidden; }
     <div id="drawer" class="absolute right-0 top-0 h-full w-72 bg-white shadow-2xl transform translate-x-full transition-transform duration-300">
       <div class="p-6 border-b"><div class="flex items-center justify-between mb-4"><h2 class="text-xl font-bold">القائمة</h2><button id="closeDrawer" class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>
       <nav class="p-4">
+        <a href="#" data-modal="settings" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 mb-2">
+  <i data-lucide="settings" class="w-5 h-5"></i>
+  <span class="font-semibold">الإعدادات</span>
+</a>
         <a href="#" data-page="home" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 mb-2"><i data-lucide="home" class="w-5 h-5"></i><span class="font-semibold">الرئيسية</span></a>
         <a href="#" data-modal="about" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 mb-2"><i data-lucide="info" class="w-5 h-5"></i><span class="font-semibold">حول</span></a>
         <a href="#" data-modal="contact" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 mb-2"><i data-lucide="mail" class="w-5 h-5"></i><span class="font-semibold">تواصل معنا</span></a>
@@ -240,36 +244,73 @@ function showGenericModal(type) {
   const modal = document.getElementById('genericModal'); 
   const content = document.getElementById('genericModalContent'); 
   
-  if(type === 'contact') {
+  if(type === 'settings') {
+    const notifications = localStorage.getItem('notifications') === 'true';
+    const darkMode = localStorage.getItem('darkMode') === 'true';
+    
     content.innerHTML = `
     <div class="p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-2xl font-bold">تواصل معنا</h3>
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">الإعدادات</h3>
         <button onclick="closeGenericModal()"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <p class="text-gray-600 mb-4">ابعتلنا رسالتك وهنرد عليك في أسرع وقت</p>
       
-      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeZeE_PjVWKLSHQAtyWcaI0BjWj7aZiRSbjw61qjD-psXR7WA/viewform?usp=header" 
-        width="100%" 
-        height="550" 
-        frameborder="0" 
-        marginheight="0" 
-        marginwidth="0">
-        جاري التحميل...
-      </iframe>
-    </div>`;
-  } else {
-    content.innerHTML = `
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-2xl font-bold">حول المتجر</h3>
-        <button onclick="closeGenericModal()"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+          <div>
+            <p class="font-semibold">إشعارات التطبيقات الجديدة</p>
+            <p class="text-sm text-gray-500">هيجيلك تنبيه لما نضيف تطبيق</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="notifToggle" ${notifications ? 'checked' : ''} class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#01875f] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+          </label>
+        </div>
+
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+          <div>
+            <p class="font-semibold">الوضع الليلي</p>
+            <p class="text-sm text-gray-500">تفعيل الثيم الغامق</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="darkToggle" ${darkMode ? 'checked' : ''} class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-[#01875f] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+          </label>
+        </div>
+
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+          <div>
+            <p class="font-semibold">مسح الكاش</p>
+            <p class="text-sm text-gray-500">حذف البيانات المحفوظة</p>
+          </div>
+          <button onclick="clearCache()" class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-semibold">مسح</button>
+        </div>
       </div>
-      <p class="text-gray-600 mb-2">متجر MOHAMED PLAY STORE لرفع وتحميل التطبيقات والألعاب</p>
-      <p class="text-sm text-gray-500 mb-4">صنع بـواسطه MOHAMED GHARIB</p>
-      <button onclick="closeGenericModal()" class="w-full px-4 py-2 bg-[#01875f] text-white rounded-xl font-semibold">إغلاق</button>
     </div>`;
+    
+    setTimeout(() => {
+      document.getElementById('notifToggle').onchange = (e) => {
+        localStorage.setItem('notifications', e.target.checked);
+        showToast(e.target.checked ? 'تم تفعيل الاشعارات' : 'تم ايقاف الاشعارات');
+      }
+      document.getElementById('darkToggle').onchange = (e) => {
+        localStorage.setItem('darkMode', e.target.checked);
+        toggleDarkMode(e.target.checked);
+        showToast(e.target.checked ? 'تم تفعيل الوضع الليلي' : 'تم ايقاف الوضع الليلي');
+      }
+      lucide.createIcons();
+    }, 100);
+
+  } else if(type === 'contact') {
+    // ... كود تواصل معنا اللي فات
+  } else {
+    content.innerHTML = `<div class="p-6"><h3 class="text-2xl font-bold mb-4">حول المتجر</h3><p>متجر MOHAMED PLAY STORE</p><button onclick="closeGenericModal()" class="mt-4 w-full px-4 py-2 bg-[#01875f] text-white rounded-xl">إغلاق</button></div>`;
   }
+  
+  modal.classList.remove('hidden'); 
+  modal.classList.add('flex'); 
+  lucide.createIcons();
+}
   
   modal.classList.remove('hidden'); 
   modal.classList.add('flex'); 
