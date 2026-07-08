@@ -318,6 +318,28 @@ function showGenericModal(type) {
 }
 window.closeGenericModal = function() { document.getElementById('genericModal').classList.add('hidden'); document.getElementById('genericModal').classList.remove('flex'); }
 function showToast(message) { const toast = document.getElementById('toast'); document.getElementById('toastMessage').textContent = message; toast.classList.remove('translate-y-20', 'opacity-0'); setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000); }
+function toggleDarkMode(isDark) {
+  if(isDark) {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('bg-gray-900', 'text-white');
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.body.classList.remove('bg-gray-900', 'text-white');
+  }
+}
+
+function clearCache() {
+  localStorage.clear();
+  showToast('تم مسح الكاش');
+  setTimeout(() => location.reload(), 1000);
+}
+
+// يشغل الوضع الليلي اول ما الموقع يفتح
+document.addEventListener('DOMContentLoaded', () => {
+  if(localStorage.getItem('darkMode') === 'true') {
+    toggleDarkMode(true);
+  }
+});
 </script>
 </body>
 </html>
