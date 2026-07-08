@@ -4,342 +4,255 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MOHAMED PLAY STORE</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.documentElement.classList.add('dark')
+  }
+  tailwind.config = { darkMode: 'class' }
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <style>
-* { font-family: 'Cairo', sans-serif; }
-html { scroll-behavior: smooth; }
-body { overflow-x: hidden; }
-.rainbow-text {
-  background: linear-gradient(90deg, #ff0080, #ff8c00, #ffed00, #00ff00, #00ffee, #0080ff, #8000ff, #ff0080);
-  background-size: 400% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  animation: rainbow 3s linear infinite;
-}
-@keyframes rainbow { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
-.intro-fade-out { animation: fadeOut 1s ease-in-out forwards; }
-@keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-.app-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-.app-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
-.nav-btn.active { color: #01875f; position: relative; }
-.nav-btn.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 30px; height: 3px; background: #01875f; border-radius: 2px; }
-.drawer-overlay,.modal-backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
-.loader { border-top-color: #01875f; animation: spinner 0.6s linear infinite; }
-@keyframes spinner { to { transform: rotate(360deg); } }
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+  body { font-family: 'Cairo', sans-serif; }
+ .dark body { background-color: #111827; color: white; }
+ .dark.bg-white { background-color: #1f2937!important; }
+ .dark.bg-gray-50 { background-color: #374151!important; }
+ .dark.text-gray-600 { color: #d1d5db!important; }
+ .dark.border { border-color: #4b5563!important; }
 </style>
-</head>
-<body class="bg-white">
 
-<div id="introScreen" class="fixed inset-0 bg-black z-50 flex items-center justify-center">
-  <div class="text-center px-4">
-    <h1 class="text-4xl md:text-7xl font-extrabold rainbow-text mb-6">MOHAMED PLAY STORE</h1>
-    <p class="text-gray-400 text-lg md:text-xl">متجر التطبيقات المصنوعة بـواسطه MOHAMED GHARIB</p>
-    <div class="mt-8 flex justify-center"><div class="w-12 h-12 border-4 border-gray-700 border-t-white rounded-full animate-spin"></div></div>
-  </div>
-</div>
-
-<div id="adminLoginModal" class="fixed inset-0 modal-backdrop z-[60] hidden items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6">
-    <div class="text-center mb-6">
-      <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="shield-check" class="w-8 h-8 text-white"></i></div>
-      <h3 class="text-2xl font-bold text-gray-900 mb-2">لوحة التحكم السرية</h3>
-    </div>
-    <form id="adminLoginForm">
-      <div class="mb-4"><label class="block text-sm font-semibold text-gray-700 mb-2">كلمة المرور</label><input type="password" id="adminPassword" class="w-full px-4 py-3 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"></div>
-      <div id="loginError" class="hidden mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl"></div>
-      <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl">دخول</button>
-      <button type="button" onclick="closeAdminLogin()" class="w-full mt-3 text-gray-600 font-semibold py-2 rounded-xl hover:bg-gray-100">إلغاء</button>
-    </form>
-  </div>
-</div>
-
-<div id="adminDashboard" class="fixed inset-0 bg-gray-50 z-[55] hidden overflow-y-auto">
-  <div class="max-w-7xl mx-auto p-4 md:p-6">
-    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 mb-6 text-white shadow-xl">
-      <div class="flex items-center justify-between flex-wrap gap-4">
-        <div><h2 class="text-2xl md:text-3xl font-bold mb-2">لوحة تحكم المشرف</h2><p class="text-purple-100">إدارة المتجر</p></div>
-        <div class="flex gap-2">
-          <button onclick="adminLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-semibold flex items-center gap-2"><i data-lucide="log-out" class="w-4 h-4"></i><span>خروج</span></button>
-          <button onclick="closeAdminDashboard()" class="px-4 py-2 bg-white text-purple-600 rounded-xl font-semibold">إغلاق</button>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-        <div class="bg-white/10 backdrop-blur rounded-xl p-4"><p class="text-sm text-purple-100 mb-1">إجمالي التحميلات</p><p class="text-3xl font-bold" id="totalDownloads">0</p></div>
-        <div class="bg-white/10 backdrop-blur rounded-xl p-4"><p class="text-sm text-purple-100 mb-1">المشاهدات</p><p class="text-3xl font-bold" id="totalViews">0</p></div>
-        <div class="bg-white/10 backdrop-blur rounded-xl p-4"><p class="text-sm text-purple-100 mb-1">التطبيقات</p><p class="text-3xl font-bold" id="totalApps">0</p></div>
-      </div>
-    </div>
-    <div class="bg-white rounded-2xl p-6 shadow-sm border-gray-200 mb-6">
-      <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="plus-circle" class="w-5 h-5 text-[#01875f]"></i><span id="formTitle">إضافة تطبيق جديد</span></h3>
-      <form id="addAppForm" class="space-y-4">
-        <input type="hidden" id="editAppId">
-        <div class="grid md:grid-cols-2 gap-4">
-          <div><label class="block text-sm font-semibold mb-2">اسم التطبيق *</label><input type="text" id="appName" required class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#01875f]"></div>
-          <div><label class="block text-sm font-semibold mb-2">المطور *</label><input type="text" id="appDeveloper" required class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#01875f]"></div>
-          <div><label class="block text-sm font-semibold mb-2">التصنيف *</label>
-            <select id="appCategory" required class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#01875f]">
-              <option value="">اختر</option><option value="home">الرئيسية</option><option value="games">الألعاب</option><option value="apps">التطبيقات</option><option value="kids">الأطفال</option>
-            </select>
-          </div>
-          <div><label class="block text-sm font-semibold mb-2">الحجم *</label><input type="text" id="appSize" required class="w-full px-4 py-2.5 border rounded-xl" placeholder="10.5 MB"></div>
-          <div><label class="block text-sm font-semibold mb-2">رابط الأيقونة *</label><input type="url" id="appIcon" required class="w-full px-4 py-2.5 border rounded-xl"></div>
-          <div><label class="block text-sm font-semibold mb-2">رابط التحميل *</label><input type="url" id="appDownloadUrl" required class="w-full px-4 py-2.5 border rounded-xl"></div>
-        </div>
-        <div><label class="block text-sm font-semibold mb-2">الوصف *</label><textarea id="appDescription" required rows="3" class="w-full px-4 py-2.5 border rounded-xl resize-none"></textarea></div>
-        <div><label class="block text-sm font-semibold mb-2">صور لقطات الشاشة</label><textarea id="appScreenshots" rows="3" class="w-full px-4 py-2.5 border rounded-xl resize-none"></textarea></div>
-        <div><label class="block text-sm font-semibold mb-2">المميزات</label><textarea id="appFeatures" rows="4" class="w-full px-4 py-2.5 border rounded-xl resize-none"></textarea></div>
-        <div class="flex gap-3">
-          <button type="submit" class="flex-1 bg-[#01875f] hover:bg-[#016b47] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2"><i data-lucide="save" class="w-5 h-5"></i><span id="submitBtnText">إضافة التطبيق</span></button>
-          <button type="button" onclick="cancelEdit()" id="cancelEditBtn" class="hidden px-6 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3.5 rounded-xl">إلغاء</button>
-        </div>
-      </form>
-    </div>
-    <div class="bg-white rounded-2xl p-6 shadow-sm border-gray-200">
-      <div class="flex items-center justify-between mb-4"><h3 class="text-xl font-bold">إدارة التطبيقات</h3></div>
-      <div id="appsListAdmin" class="space-y-3 max-h-[600px] overflow-y-auto"></div>
-    </div>
-  </div>
-</div>
-
-<div id="mainApp" class="hidden min-h-screen flex flex-col">
-  <header class="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
-    <div class="mx-auto px-3 md:px-6 py-3">
-      <div class="flex items-center justify-between gap-3">
-        <button id="menuBtn" class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="menu" class="w-6 h-6 text-gray-700"></i></button>
-        <div class="flex-1 max-w-3xl">
-          <div class="relative">
-            <input type="text" id="searchInput" placeholder="البحث عن التطبيقات والألعاب" class="w-full px-4 py-2.5 pr-11 bg-gray-100 border-0 rounded-full text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#01875f] focus:bg-white">
-            <i data-lucide="search" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"></i>
-          </div>
-        </div>
-        <h1 id="logoBtn" class="text-lg md:text-2xl font-extrabold cursor-pointer select-none"><span class="rainbow-text">MOHAMED</span><span class="text-gray-800"> PLAY STORE</span></h1>
-      </div>
-    </div>
-  </header>
-
-  <div id="drawerOverlay" class="fixed inset-0 drawer-overlay z-50 hidden opacity-0 transition-opacity duration-300">
-    <div id="drawer" class="absolute right-0 top-0 h-full w-72 bg-white shadow-2xl transform translate-x-full transition-transform duration-300">
-      <div class="p-6 border-b"><div class="flex items-center justify-between mb-4"><h2 class="text-xl font-bold">القائمة</h2><button id="closeDrawer" class="p-2 hover:bg-gray-100 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>
-      <nav class="p-4">
-        <a href="#" data-modal="settings" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 mb-2">
-  <i data-lucide="settings" class="w-5 h-5"></i>
-  <span class="font-semibold">الإعدادات</span>
-</a>
-        <a href="#" data-page="home" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 mb-2"><i data-lucide="home" class="w-5 h-5"></i><span class="font-semibold">الرئيسية</span></a>
-        <a href="#" data-modal="about" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 mb-2"><i data-lucide="info" class="w-5 h-5"></i><span class="font-semibold">حول</span></a>
-        <a href="#" data-modal="contact" class="drawer-link flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 mb-2"><i data-lucide="mail" class="w-5 h-5"></i><span class="font-semibold">تواصل معنا</span></a>
-      </nav>
-    </div>
-  </div>
-
-  <main class="flex-1 pb-20 md:pb-6">
-    <div class="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-6">
-      <div class="mb-6"><h2 id="sectionTitle" class="text-2xl md:text-3xl font-bold">التطبيقات المميزة</h2><p id="sectionDesc" class="text-gray-600">اكتشف أفضل التطبيقات</p></div>
-      <div id="loadingApps" class="hidden text-center py-16"><div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 mx-auto mb-4"></div><p>جاري تحميل التطبيقات...</p></div>
-      <div id="appsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5"></div>
-      <div id="noResults" class="hidden text-center py-16"><i data-lucide="search-x" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i><h3 class="text-xl font-bold">لا توجد نتائج</h3></div>
-    </div>
-  </main>
-
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t z-30 md:hidden">
-    <div class="flex items-center justify-around py-2">
-      <button data-nav="home" class="nav-btn active flex flex-col items-center gap-1 px-4 py-2"><i data-lucide="layout-grid" class="w-5 h-5"></i><span class="text-xs font-semibold">الرئيسية</span></button>
-      <button data-nav="games" class="nav-btn flex-col items-center gap-1 px-4 py-2 text-gray-600"><i data-lucide="gamepad-2" class="w-5 h-5"></i><span class="text-xs font-semibold">الألعاب</span></button>
-      <button data-nav="apps" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600"><i data-lucide="smartphone" class="w-5 h-5"></i><span class="text-xs font-semibold">التطبيقات</span></button>
-      <button data-nav="kids" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600"><i data-lucide="baby" class="w-5 h-5"></i><span class="text-xs font-semibold">الأطفال</span></button>
-    </div>
-  </nav>
-</div>
-
-<div id="appModal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-3 md:p-6"><div class="bg-white rounded-3xl max-w-4xl w-full max-h- overflow-hidden flex flex-col shadow-2xl" id="modalContent"></div></div>
-<div id="genericModal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-4"><div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl" id="genericModalContent"></div></div>
-<div id="toast" class="fixed bottom-24 right-4 left-4 md:right-auto md:max-w-sm bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[70]"><div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i><p id="toastMessage" class="font-semibold"></p></div></div>
-
+<!-- Firebase -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, orderBy, increment, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, increment, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDSxk0kXJGs__nmtF4V4V_Ro_kkBhzE6IA", authDomain: "mohamed-play-store.firebaseapp.com",
-  projectId: "mohamed-play-store", storageBucket: "mohamed-play-store.firebasestorage.app",
-  messagingSenderId: "966596585443", appId: "1:966596585443:web:ac43976b53e72225ee62d6"
+  const firebaseConfig = {
+    apiKey: "حط_مفتاحك_هنا",
+    authDomain: "mohamed-play-store.firebaseapp.com",
+    projectId: "mohamed-play-store",
+    storageBucket: "mohamed-play-store.appspot.com",
+    messagingSenderId: "حط_الرقم_هنا",
+    appId: "حط_الايدي_هنا"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app);
+  window.firebaseUtils = { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, increment, onSnapshot, query, orderBy };
+</script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+
+<!-- الهيدر -->
+<header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button id="menuBtn"><i data-lucide="menu"></i></button>
+      <h1 id="logo" class="text-xl font-bold text-[#01875f] cursor-pointer">MOHAMED PLAY STORE</h1>
+    </div>
+    <input type="text" id="searchInput" placeholder="ابحث عن تطبيق..." class="hidden md:block px-4 py-2 rounded-xl border dark:bg-gray-700">
+  </div>
+</header>
+
+<!-- القائمة الجانبية -->
+<div id="drawer" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+  <div class="w-64 h-full bg-white dark:bg-gray-800 p-4">
+    <button id="closeDrawer" class="mb-4"><i data-lucide="x"></i></button>
+    <nav>
+      <a href="#" class="drawer-link flex gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 mb-2"><i data-lucide="home"></i><span>الرئيسية</span></a>
+      <a href="#" data-modal="settings" class="drawer-link flex gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 mb-2"><i data-lucide="settings"></i><span>الإعدادات</span></a>
+      <a href="#" data-modal="contact" class="drawer-link flex gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 mb-2"><i data-lucide="mail"></i><span>تواصل معنا</span></a>
+      <a href="#" data-modal="about" class="drawer-link flex gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 mb-2"><i data-lucide="info"></i><span>حول المتجر</span></a>
+    </nav>
+  </div>
+</div>
+
+<!-- المحتوى -->
+<main class="container mx-auto px-4 py-6">
+  <div id="appsGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+</main>
+
+<!-- مودال عام -->
+<div id="genericModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+  <div id="genericModalContent" class="bg-white dark:bg-gray-800 rounded-2xl w-11/12 max-w-lg max-h-[90vh] overflow-y-auto"></div>
+</div>
+
+<!-- مودال التفاصيل -->
+<div id="appDetailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+  <div id="appDetailContent" class="bg-white dark:bg-gray-800 rounded-2xl w-11/12 max-w-2xl p-6"></div>
+</div>
+
+<!-- مودال الادمن -->
+<div id="adminModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl w-11/12 max-w-4xl p-6 max-h-[90vh] overflow-y-auto">
+    <h3 class="text-2xl font-bold mb-4">لوحة التحكم</h3>
+    <form id="addAppForm" class="space-y-3 mb-6">
+      <input id="appName" placeholder="اسم التطبيق" required class="w-full p-2 border rounded-xl dark:bg-gray-700">
+      <input id="appDev" placeholder="المطور" required class="w-full p-2 border rounded-xl dark:bg-gray-700">
+      <select id="appCat" class="w-full p-2 border rounded-xl dark:bg-gray-700">
+        <option value="games">ألعاب</option>
+        <option value="apps">تطبيقات</option>
+        <option value="kids">أطفال</option>
+      </select>
+      <input id="appIcon" placeholder="رابط الايقونة" required class="w-full p-2 border rounded-xl dark:bg-gray-700">
+      <input id="appDownload" placeholder="رابط التحميل" required class="w-full p-2 border rounded-xl dark:bg-gray-700">
+      <textarea id="appDesc" placeholder="الوصف" class="w-full p-2 border rounded-xl dark:bg-gray-700"></textarea>
+      <button type="submit" class="w-full bg-[#01875f] text-white py-2 rounded-xl font-bold">إضافة التطبيق</button>
+    </form>
+    <div id="adminAppsList"></div>
+    <button onclick="closeAdminModal()" class="mt-4 w-full bg-gray-500 text-white py-2 rounded-xl">إغلاق</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded-xl hidden"></div>
+<script type="module">
+const { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, increment, onSnapshot, query, orderBy } = window.firebaseUtils;
+const db = window.db;
+
+let clickCount = 0;
+let apps = [];
+
+// فتح وقفل القائمة
+document.getElementById('menuBtn').onclick = () => document.getElementById('drawer').classList.remove('hidden');
+document.getElementById('closeDrawer').onclick = () => document.getElementById('drawer').classList.add('hidden');
+
+// ضغط اللوجو 5 مرات للادمن
+document.getElementById('logo').onclick = () => {
+  clickCount++;
+  if(clickCount >= 5) {
+    const pass = prompt('كلمة السر:');
+    if(pass === 'mohamed123') document.getElementById('adminModal').classList.remove('hidden');
+    clickCount = 0;
+  }
 };
-const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-const ADMIN_PASSWORD = 'mohamed123';
-let currentSection = 'home'; let isAdminLoggedIn = false; let allAppsData = {}; let isEditMode = false;
+function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
+window.closeAdminModal = closeAdminModal;
 
-async function loadAppsFromFirestore() {
-  document.getElementById('loadingApps').classList.remove('hidden');
-  try {
-    const q = query(collection(db, "apps"), orderBy("name"));
-    const querySnapshot = await getDocs(q); allAppsData = {};
-    querySnapshot.forEach((doc) => { allAppsData[doc.id] = { id: doc.id,...doc.data() }; });
-    document.getElementById('loadingApps').classList.add('hidden'); loadApps(currentSection);
-    document.getElementById('totalApps').textContent = Object.keys(allAppsData).length;
-    if (isAdminLoggedIn) updateAdminStats();
-  } catch (error) { document.getElementById('loadingApps').classList.add('hidden'); showToast('خطأ: ' + error.message); }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  lucide.createIcons(); loadAppsFromFirestore();
-  setTimeout(() => {
-    document.getElementById('introScreen').classList.add('intro-fade-out');
-    setTimeout(() => { document.getElementById('introScreen').style.display = 'none'; document.getElementById('mainApp').classList.remove('hidden'); document.getElementById('mainApp').classList.add('flex'); }, 1000);
-  }, 3000);
-
-  document.getElementById('menuBtn').onclick = () => { document.getElementById('drawerOverlay').classList.remove('hidden'); setTimeout(()=>{document.getElementById('drawerOverlay').classList.remove('opacity-0');document.getElementById('drawer').classList.remove('translate-x-full')},10) };
-  document.getElementById('closeDrawer').onclick = () => { document.getElementById('drawerOverlay').classList.add('opacity-0');document.getElementById('drawer').classList.add('translate-x-full');setTimeout(()=>document.getElementById('drawerOverlay').classList.add('hidden'),300) };
-  document.querySelectorAll('[data-nav]').forEach(btn => btn.onclick = (e) => switchSection(e.currentTarget.dataset.nav));
-  document.querySelectorAll('.drawer-link').forEach(link => link.onclick = (e) => { e.preventDefault(); const modal = e.currentTarget.dataset.modal; if(modal) showGenericModal(modal); document.getElementById('closeDrawer').click(); });
-  document.getElementById('searchInput').oninput = (e) => loadApps(currentSection, e.target.value.trim());
-  document.getElementById('logoBtn').onclick = () => { showAdminLogin() };
-  document.getElementById('adminLoginForm').onsubmit = handleAdminLogin;
-  document.getElementById('addAppForm').onsubmit = handleAddApp;
+// جلب التطبيقات من Firebase
+const q = query(collection(db, "apps"), orderBy("date", "desc"));
+onSnapshot(q, (snapshot) => {
+  apps = [];
+  snapshot.forEach(doc => apps.push({id: doc.id,...doc.data()}));
+  renderApps(apps);
+  renderAdminApps();
 });
 
-function switchSection(section) {
-  currentSection = section;
-  document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('active', 'text-[#01875f]'); btn.classList.add('text-gray-600'); if (btn.dataset.nav === section) { btn.classList.add('active', 'text-[#01875f]'); btn.classList.remove('text-gray-600'); } });
-  const titles = { home: { title: 'التطبيقات المميزة', desc: 'اكتشف أفضل التطبيقات' }, games: { title: 'الألعاب', desc: 'مجموعة من الألعاب الممتعة' }, apps: { title: 'التطبيقات', desc: 'تطبيقات عملية' }, kids: { title: 'تطبيقات الأطفال', desc: 'محتوى آمن وتعليمي' } };
-  document.getElementById('sectionTitle').textContent = titles[section].title; document.getElementById('sectionDesc').textContent = titles[section].desc; loadApps(section);
+// اضافة تطبيق
+document.getElementById('addAppForm').onsubmit = async (e) => {
+  e.preventDefault();
+  await addDoc(collection(db, "apps"), {
+    name: appName.value, dev: appDev.value, cat: appCat.value,
+    icon: appIcon.value, download: appDownload.value, desc: appDesc.value,
+    views: 0, downloads: 0, date: new Date().toISOString()
+  });
+  e.target.reset();
+  showToast('تم اضافة التطبيق');
+};
+
+// عرض التطبيقات
+function renderApps(list) {
+  appsGrid.innerHTML = list.map(app => `
+    <div onclick="openAppDetail('${app.id}')" class="bg-white dark:bg-gray-800 rounded-xl p-3 shadow cursor-pointer hover:scale-105 transition">
+      <img src="${app.icon}" class="w-full aspect-square rounded-xl mb-2">
+      <p class="font-bold text-sm truncate">${app.name}</p>
+      <p class="text-xs text-gray-500">${app.dev}</p>
+    </div>
+  `).join('');
 }
 
-function loadApps(section, searchTerm = '') {
-  const apps = Object.values(allAppsData); let appsToShow = section === 'home'? apps : apps.filter(app => app.category === section);
-  let filteredApps = searchTerm? appsToShow.filter(app => app.name.toLowerCase().includes(searchTerm.toLowerCase())) : appsToShow; renderApps(filteredApps);
+// تفاصيل التطبيق
+window.openAppDetail = async (id) => {
+  const app = apps.find(a => a.id === id);
+  await updateDoc(doc(db, "apps", id), { views: increment(1) });
+  appDetailContent.innerHTML = `
+    <img src="${app.icon}" class="w-24 h-24 rounded-2xl mb-4">
+    <h3 class="text-2xl font-bold">${app.name}</h3>
+    <p class="text-gray-500 mb-4">${app.dev}</p>
+    <p class="mb-4">${app.desc}</p>
+    <a href="${app.download}" target="_blank" onclick="incrementDownload('${id}')" class="block w-full bg-[#01875f] text-white text-center py-3 rounded-xl font-bold">تحميل</a>
+    <button onclick="closeAppDetail()" class="mt-2 w-full bg-gray-200 dark:bg-gray-700 py-2 rounded-xl">إغلاق</button>
+  `;
+  appDetailModal.classList.remove('hidden');
+  appDetailModal.classList.add('flex');
+};
+window.closeAppDetail = () => appDetailModal.classList.add('hidden');
+window.incrementDownload = (id) => updateDoc(doc(db, "apps", id), { downloads: increment(1) });
+
+// لوحة الادمن
+function renderAdminApps() {
+  adminAppsList.innerHTML = apps.map(app => `
+    <div class="flex justify-between items-center p-2 border-b">
+      <span>${app.name}</span>
+      <button onclick="deleteApp('${app.id}')" class="text-red-500">حذف</button>
+    </div>
+  `).join('');
 }
+window.deleteApp = (id) => deleteDoc(doc(db, "apps", id));
 
-function renderApps(apps) {
-  const grid = document.getElementById('appsGrid'); const noResults = document.getElementById('noResults');
-  if (apps.length === 0) { grid.innerHTML = ''; noResults.classList.remove('hidden'); return; }
-  noResults.classList.add('hidden');
-  grid.innerHTML = apps.map(app => `
-    <div class="app-card bg-white rounded-2xl p-4 cursor-pointer border-gray-200" onclick="showAppDetail('${app.id}')">
-      <div class="flex gap-3 mb-3"><img src="${app.icon}" class="w-16 h-16 rounded-2xl object-cover"><div><h3 class="font-bold truncate">${app.name}</h3><p class="text-sm text-gray-600">${app.developer}</p><div class="flex items-center gap-2 text-xs text-gray-500"><span class="flex items-center gap-1"><span>${app.rating}</span><i data-lucide="star" class="w-3 h-3 fill-yellow-400 text-yellow-400"></i></span><span>•</span><span>${app.size}</span></div></div></div>
-      <p class="text-xs text-gray-600 mb-3">${app.description}</p><div class="flex gap-2"><span class="px-3 py-1 bg-green-50 text-[#01875f] text-xs font-semibold rounded-full">${getCategoryName(app.category)}</span><span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">${app.downloads||0} تحميل</span></div>
-    </div>`).join(''); lucide.createIcons();
-}
+// المودالات العامة
+function showGenericModal(type) {
+  const modal = document.getElementById('genericModal');
+  const content = document.getElementById('genericModalContent');
 
-function getCategoryName(cat) { const names = { home: 'مميز', games: 'ألعاب', apps: 'تطبيقات', kids: 'أطفال' }; return names[cat] || cat; }
-
-window.showAppDetail = function(appId) { const app = allAppsData[appId]; if (!app) return; updateDoc(doc(db, "apps", appId), { views: increment(1) }); const modal = document.getElementById('appModal'); document.getElementById('modalContent').innerHTML = `<div class="p-6"><div class="flex justify-between mb-4"><h2 class="text-2xl font-bold">${app.name}</h2><button onclick="closeAppModal()"><i data-lucide="x"></i></button></div><img src="${app.icon}" class="w-24 h-24 rounded-3xl mb-4"><p class="mb-4">${app.description}</p><button onclick="updateDoc(doc(db,'apps','${appId}'),{downloads:increment(1)});window.open('${app.downloadUrl}','_blank')" class="w-full bg-[#01875f] text-white font-bold py-3.5 rounded-full">تحميل</button></div>`; modal.classList.remove('hidden'); modal.classList.add('flex'); lucide.createIcons(); }
-window.closeAppModal = function() { document.getElementById('appModal').classList.add('hidden'); document.getElementById('appModal').classList.remove('flex'); }
-
-function showAdminLogin() { document.getElementById('adminLoginModal').classList.remove('hidden'); document.getElementById('adminLoginModal').classList.add('flex'); }
-window.closeAdminLogin = function() { document.getElementById('adminLoginModal').classList.add('hidden'); document.getElementById('adminLoginModal').classList.remove('flex'); }
-function handleAdminLogin(e) { e.preventDefault(); if(document.getElementById('adminPassword').value === ADMIN_PASSWORD) { isAdminLoggedIn = true; closeAdminLogin(); document.getElementById('adminDashboard').classList.remove('hidden'); updateAdminStats(); showToast('تم الدخول'); } else { document.getElementById('loginError').textContent = 'كلمة غلط'; document.getElementById('loginError').classList.remove('hidden'); } }
-window.closeAdminDashboard = function() { document.getElementById('adminDashboard').classList.add('hidden'); }
-window.adminLogout = function() { isAdminLoggedIn = false; closeAdminDashboard(); showToast('تم الخروج'); }
-
-function updateAdminStats() { const apps = Object.values(allAppsData); document.getElementById('totalDownloads').textContent = apps.reduce((sum, app) => sum + (app.downloads || 0), 0); document.getElementById('totalViews').textContent = apps.reduce((sum, app) => sum + (app.views || 0), 0); renderAppsListAdmin(); }
-function renderAppsListAdmin() { const appsListAdmin = document.getElementById('appsListAdmin'); appsListAdmin.innerHTML = Object.values(allAppsData).map(app => `<div class="flex justify-between p-4 bg-gray-50 rounded-xl"><div><p class="font-bold">${app.name}</p><p class="text-xs">${app.downloads||0} تحميل</p></div><button onclick="deleteApp('${app.id}')" class="px-3 py-2 bg-red-500 text-white text-xs rounded-lg">حذف</button></div>`).join(''); }
-
-async function handleAddApp(e) { e.preventDefault(); const appData = { name: appName.value, developer: appDeveloper.value, category: appCategory.value, size: appSize.value, icon: appIcon.value, downloadUrl: appDownloadUrl.value, description: appDescription.value, screenshots: appScreenshots.value.split('\n').filter(url => url.trim()), features: appFeatures.value.split('\n').filter(f => f.trim()), downloads: 0, views: 0, rating: 5.0 }; await addDoc(collection(db, "apps"), appData); showToast('تمت الإضافة'); e.target.reset(); loadAppsFromFirestore(); }
-window.deleteApp = async function(appId) { if(confirm('متأكد؟')) { await deleteDoc(doc(db, "apps", appId)); showToast('تم الحذف'); loadAppsFromFirestore(); } }
-
-function showGenericModal(type) { 
-  const modal = document.getElementById('genericModal'); 
-  const content = document.getElementById('genericModalContent'); 
-  
   if(type === 'settings') {
     const notifications = localStorage.getItem('notifications') === 'true';
     const darkMode = localStorage.getItem('darkMode') === 'true';
-    
     content.innerHTML = `
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-2xl font-bold">الإعدادات</h3>
-        <button onclick="closeGenericModal()"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="closeGenericModal()"><i data-lucide="x"></i></button>
       </div>
-      
       <div class="space-y-4">
-        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-          <div>
-            <p class="font-semibold">إشعارات التطبيقات الجديدة</p>
-            <p class="text-sm text-gray-500">هيجيلك تنبيه لما نضيف تطبيق</p>
-          </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="notifToggle" ${notifications ? 'checked' : ''} class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#01875f] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
-          </label>
+        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+          <div><p class="font-semibold">إشعارات التطبيقات الجديدة</p></div>
+          <input type="checkbox" id="notifToggle" ${notifications? 'checked' : ''}>
         </div>
-
-        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-          <div>
-            <p class="font-semibold">الوضع الليلي</p>
-            <p class="text-sm text-gray-500">تفعيل الثيم الغامق</p>
-          </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="darkToggle" ${darkMode ? 'checked' : ''} class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-[#01875f] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
-          </label>
+        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+          <div><p class="font-semibold">الوضع الليلي</p></div>
+          <input type="checkbox" id="darkToggle" ${darkMode? 'checked' : ''}>
         </div>
-
-        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-          <div>
-            <p class="font-semibold">مسح الكاش</p>
-            <p class="text-sm text-gray-500">حذف البيانات المحفوظة</p>
-          </div>
-          <button onclick="clearCache()" class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-semibold">مسح</button>
-        </div>
+        <button onclick="clearCache()" class="w-full bg-red-500 text-white py-2 rounded-xl">مسح الكاش</button>
       </div>
     </div>`;
-    
     setTimeout(() => {
-      document.getElementById('notifToggle').onchange = (e) => {
-        localStorage.setItem('notifications', e.target.checked);
-        showToast(e.target.checked ? 'تم تفعيل الاشعارات' : 'تم ايقاف الاشعارات');
-      }
-      document.getElementById('darkToggle').onchange = (e) => {
-        localStorage.setItem('darkMode', e.target.checked);
-        toggleDarkMode(e.target.checked);
-        showToast(e.target.checked ? 'تم تفعيل الوضع الليلي' : 'تم ايقاف الوضع الليلي');
-      }
+      notifToggle.onchange = e => localStorage.setItem('notifications', e.target.checked);
+      darkToggle.onchange = e => { localStorage.setItem('darkMode', e.target.checked); toggleDarkMode(e.target.checked); };
       lucide.createIcons();
     }, 100);
-
-  } else if(type === 'contact') {
-    // ... كود تواصل معنا اللي فات
-  } else {
-    content.innerHTML = `<div class="p-6"><h3 class="text-2xl font-bold mb-4">حول المتجر</h3><p>متجر MOHAMED PLAY STORE</p><button onclick="closeGenericModal()" class="mt-4 w-full px-4 py-2 bg-[#01875f] text-white rounded-xl">إغلاق</button></div>`;
   }
-  
-  modal.classList.remove('hidden'); 
-  modal.classList.add('flex'); 
-  lucide.createIcons();
-}
-  
-  modal.classList.remove('hidden'); 
-  modal.classList.add('flex'); 
-  lucide.createIcons();
-}
-window.closeGenericModal = function() { document.getElementById('genericModal').classList.add('hidden'); document.getElementById('genericModal').classList.remove('flex'); }
-function showToast(message) { const toast = document.getElementById('toast'); document.getElementById('toastMessage').textContent = message; toast.classList.remove('translate-y-20', 'opacity-0'); setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000); }
-function toggleDarkMode(isDark) {
-  if(isDark) {
-    document.documentElement.classList.add('dark');
-    document.body.classList.add('bg-gray-900', 'text-white');
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.body.classList.remove('bg-gray-900', 'text-white');
+  else if(type === 'contact') {
+    content.innerHTML = `<div class="p-6"><h3 class="text-2xl font-bold">تواصل معنا</h3><p>ابعتلنا رسالتك</p><button onclick="closeGenericModal()" class="mt-4 w-full bg-[#01875f] text-white py-2 rounded-xl">إغلاق</button></div>`;
   }
+  else {
+    content.innerHTML = `<div class="p-6"><h3 class="text-2xl font-bold">حول المتجر</h3><p>متجر MOHAMED PLAY STORE</p><button onclick="closeGenericModal()" class="mt-4 w-full bg-[#01875f] text-white py-2 rounded-xl">إغلاق</button></div>`;
+  }
+  modal.classList.remove('hidden'); modal.classList.add('flex'); lucide.createIcons();
 }
+window.closeGenericModal = () => genericModal.classList.add('hidden');
 
-function clearCache() {
-  localStorage.clear();
-  showToast('تم مسح الكاش');
-  setTimeout(() => location.reload(), 1000);
-}
-
-// يشغل الوضع الليلي اول ما الموقع يفتح
-document.addEventListener('DOMContentLoaded', () => {
-  if(localStorage.getItem('darkMode') === 'true') {
-    toggleDarkMode(true);
+document.querySelectorAll('.drawer-link').forEach(link => {
+  link.onclick = (e) => {
+    const type = e.currentTarget.dataset.modal;
+    if(type) showGenericModal(type);
+    document.getElementById('drawer').classList.add('hidden');
   }
 });
+
+// دوال مساعدة
+function toggleDarkMode(isDark) {
+  if(isDark) document.documentElement.classList.add('dark');
+  else document.documentElement.classList.remove('dark');
+}
+function clearCache() { localStorage.clear(); showToast('تم المسح'); location.reload(); }
+function showToast(msg) {
+  toast.textContent = msg; toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 2000);
+}
+
+lucide.createIcons();
 </script>
 </body>
 </html>
