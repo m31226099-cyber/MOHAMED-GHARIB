@@ -65,10 +65,6 @@ body { overflow-x: hidden; }
         <h2 id="sectionTitle" class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">التطبيقات المميزة</h2>
         <p id="sectionDesc" class="text-gray-600 text-sm md:text-base">اكتشف أفضل التطبيقات</p>
       </div>
-      <div id="loadingApps" class="hidden text-center py-16">
-        <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 mx-auto mb-4"></div>
-        <p class="text-gray-500">جاري تحميل التطبيقات...</p>
-      </div>
       <div id="appsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5"></div>
       <div id="noResults" class="hidden text-center py-16">
         <i data-lucide="search-x" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
@@ -82,7 +78,7 @@ body { overflow-x: hidden; }
     <div class="flex items-center justify-around py-2">
       <button data-nav="home" class="nav-btn active flex-col items-center gap-1 px-4 py-2"><i data-lucide="layout-grid" class="w-5 h-5"></i><span class="text-xs font-semibold">الرئيسية</span></button>
       <button data-nav="games" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600"><i data-lucide="gamepad-2" class="w-5 h-5"></i><span class="text-xs font-semibold">الألعاب</span></button>
-      <button data-nav="apps" class="nav-btn flex-col items-center gap-1 px-4 py-2 text-gray-600"><i data-lucide="smartphone" class="w-5 h-5"></i><span class="text-xs font-semibold">التطبيقات</span></button>
+      <button data-nav="apps" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600"><i data-lucide="smartphone" class="w-5 h-5"></i><span class="text-xs font-semibold">التطبيقات</span></button>
       <button data-nav="kids" class="nav-btn flex flex-col items-center gap-1 px-4 py-2 text-gray-600"><i data-lucide="baby" class="w-5 h-5"></i><span class="text-xs font-semibold">الأطفال</span></button>
     </div>
   </nav>
@@ -92,66 +88,41 @@ body { overflow-x: hidden; }
   <div class="bg-white rounded-3xl max-w-4xl w-full max-h- overflow-hidden flex flex-col shadow-2xl" id="modalContent"></div>
 </div>
 
-<div id="toast" class="fixed bottom-24 md:bottom-6 right-4 left-4 md:right-auto md:max-w-sm bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[70]">
-  <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-green-400 flex-shrink-0"></i><p id="toastMessage" class="font-semibold"></p></div>
-</div>
-
 <script type="module">
-// الكود شغال بدون Firebase دلوقتي - بتطبيقات تجريبية
 let currentSection = 'home';
 
-// حطيتلك تطبيق تجريبي هنا
+// تطبيقات تجريبية
 const allAppsData = {
   "app1": {
-    id: "app1",
-    name: "لعبة محمد المغامر",
-    developer: "MOHAMED GHARIB",
-    category: "games",
-    size: "45.2 MB",
-    icon: "https://cdn-icons-png.flaticon.com/512/5968/5968705.png",
-    downloadUrl: "https://google.com",
-    description: "مغامرة رائعة في عالم محمد. اجمع النقاط وتخطى العقبات واستمتع بجرافيك مذهل. اللعبة مجانية 100%",
-    screenshots: [
-      "https://via.placeholder.com/400x800/01875f/ffffff?text=Screen1",
-      "https://via.placeholder.com/400x800/ff0080/ffffff?text=Screen2"
-    ],
-    features: [
-      "جرافيك عالي الجودة",
-      "مستويات لا نهائية",
-      "تعمل بدون نت",
-      "مجانية بالكامل"
-    ],
-    downloads: 1250,
-    views: 5400,
-    rating: 4.8
+    id: "app1", name: "لعبة محمد المغامر", developer: "MOHAMED GHARIB", category: "games",
+    size: "45.2 MB", icon: "https://cdn-icons-png.flaticon.com/512/5968/5968705.png",
+    downloadUrl: "https://google.com", description: "مغامرة رائعة في عالم محمد. اجمع النقاط وتخطى العقبات",
+    screenshots: [], features: ["جرافيك عالي", "مستويات لا نهائية"], downloads: 1250, views: 5400, rating: 4.8
   },
   "app2": {
-    id: "app2",
-    name: "تطبيق المهام",
-    developer: "MOHAMED GHARIB",
-    category: "apps",
-    size: "12.5 MB",
-    icon: "https://cdn-icons-png.flaticon.com/512/5968/5968705.png",
-    downloadUrl: "https://google.com",
-    description: "نظم مهامك اليومية بسهولة. واجهة بسيطة وسريعة",
-    screenshots: [],
-    features: ["سريع", "بسيط"],
-    downloads: 320,
-    views: 1100,
-    rating: 4.5
+    id: "app2", name: "تطبيق المهام", developer: "MOHAMED GHARIB", category: "apps",
+    size: "12.5 MB", icon: "https://cdn-icons-png.flaticon.com/512/5968/5968705.png",
+    downloadUrl: "https://google.com", description: "نظم مهامك اليومية بسهولة",
+    screenshots: [], features: ["سريع", "بسيط"], downloads: 320, views: 1100, rating: 4.5
   }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   lucide.createIcons();
+  console.log("بدأ التحميل");
+
   setTimeout(() => {
+    console.log("المقدمة هتختفي");
     document.getElementById('introScreen').classList.add('intro-fade-out');
     setTimeout(() => {
       document.getElementById('introScreen').style.display = 'none';
       document.getElementById('mainApp').classList.remove('hidden');
+      document.getElementById('mainApp').classList.add('flex'); // مهم جداً
       loadApps(currentSection);
+      console.log("الصفحة الرئيسية ظهرت");
     }, 1000);
   }, 3000);
+
   setupEventListeners();
 });
 
@@ -188,9 +159,9 @@ function renderApps(apps) {
   if (apps.length === 0) { grid.innerHTML = ''; noResults.classList.remove('hidden'); return; }
   noResults.classList.add('hidden');
   grid.innerHTML = apps.map(app => `
-    <div class="app-card bg-white rounded-2xl p-4 cursor-pointer border border-gray-200" onclick="showAppDetail('${app.id}')">
+    <div class="app-card bg-white rounded-2xl p-4 cursor-pointer border-gray-200" onclick="showAppDetail('${app.id}')">
       <div class="flex gap-3 mb-3">
-        <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover flex-shrink-0">
+        <img src="${app.icon}" class="w-16 h-16 rounded-2xl object-cover flex-shrink-0">
         <div class="flex-1 min-w-0">
           <h3 class="font-bold text-gray-900 text-base mb-1 truncate">${app.name}</h3>
           <p class="text-sm text-gray-600 mb-1">${app.developer}</p>
@@ -200,7 +171,7 @@ function renderApps(apps) {
           </div>
         </div>
       </div>
-      <p class="text-xs text-gray-600 mb-3 line-clamp-2">${app.description}</p>
+      <p class="text-xs text-gray-600 mb-3">${app.description}</p>
       <div class="flex gap-2">
         <span class="px-3 py-1 bg-green-50 text-[#01875f] text-xs font-semibold rounded-full">${getCategoryName(app.category)}</span>
         <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">${app.downloads} تحميل</span>
